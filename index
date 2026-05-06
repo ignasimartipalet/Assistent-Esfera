@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistent Esfer@ · Bookmarklet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0f0f1a;
+      --ink-soft: #4a4a5a;
+      --ink-muted: #9898a8;
+      --paper: #f7f6f2;
+      --white: #ffffff;
+      --accent: #2d5be3;
+      --accent-light: #e8eefb;
+      --gold: #e8b84b;
+      --green: #2a7d4f;
+      --border: #e2e1dc;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 48px 48px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: #e6f4ed;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 80px auto 0;
+      padding: 0 32px;
+      text-align: center;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(38px, 7vw, 64px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--ink-soft);
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    /* ── DRAG ZONE ── */
+    .drag-zone {
+      background: var(--white);
+      border: 2px dashed var(--border);
+      border-radius: 24px;
+      padding: 48px 32px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .drag-zone:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .drag-zone p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .bookmarklet-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      background: var(--ink);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: 14px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      cursor: grab;
+      box-shadow: 0 8px 32px rgba(15,15,26,0.18), 0 2px 8px rgba(15,15,26,0.08);
+      transition: transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+
+    .bookmarklet-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 16px 48px rgba(15,15,26,0.22), 0 4px 12px rgba(15,15,26,0.1);
+    }
+
+    .bookmarklet-btn:active {
+      cursor: grabbing;
+      transform: translateY(0) scale(0.98);
+    }
+
+    .bookmarklet-btn .icon {
+      font-size: 20px;
+    }
+
+    /* ── STEPS ── */
+    .steps {
+      max-width: 760px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+    }
+
+    .steps-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .step {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+    }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent-light);
+      -webkit-text-stroke: 2px var(--accent);
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .step p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .step kbd {
+      font-size: 11px;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--ink-soft);
+    }
+
+    /* ── COMPAT ── */
+    .compat {
+      max-width: 760px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+    }
+
+    .compat-inner {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .compat-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .compat-inner h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .compat-inner p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer p {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    /* ── DECORATIVE BG BLOB ── */
+    .blob {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle at center, rgba(45,91,227,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -200px;
+      right: -200px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      header { padding: 28px 20px 0; }
+      .hero, .steps, .compat { padding: 0 20px; }
+      .hero { margin-top: 48px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      footer { padding: 24px 20px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob"></div>
+
+<header>
+  <span class="logo">Assistent Esfer@</span>
+  <span class="badge">v2026</span>
+</header>
+
+<main>
+  <section class="hero">
+    <span class="hero-tag">Bookmarklet per a l'Esfera</span>
+    <h1>Assistent<br><em>Esfer@</em></h1>
+    <p>Afegeix aquest marcador al teu navegador i gestiona comentaris i actes de tutoria amb un sol clic des de l'Esfera o el Moodle.</p>
+
+    <div class="drag-zone">
+      <p>↓ Arrossega aquest botó fins a la barra de marcadors ↓</p>
+      <a class="bookmarklet-btn"
+         href="javascript:(function()%7B%2F*%20%C2%A9%202026%20Ignasi%20Mart%C3%AD%20Palet%20*%2FElement.prototype.ap%3DElement.prototype.appendChild%3Bvar _c%3D(...a)%3D>document.createElement(...a)%3Bvar _q%3D(...a)%3D>document.querySelector(...a)%3Bvar _qa%3D(...a)%3D>document.querySelectorAll(...a)%3Bvar _id%3D(...a)%3D>document.getElementById(...a)%3Bvar _rm%3D(...a)%3D>document.body.removeChild(...a)%3Bvar _ba%3D(...a)%3D>document.body.appendChild(...a)%3Bvar _st%3D(...a)%3D>setTimeout(...a)%3Bvar isA%3D!!_q(%22select%5Bdata-ng-model%3D'contingut.qualitativa'%5D%22)%3Bvar isM%3D!!_q('%23my-tab-content')%3Bif(isA)%7Blet fontLink%3D_c('link')%3BfontLink.rel%3D'stylesheet'%3BfontLink.href%3D'https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DOutfit%3Awght%40400%3B500%3B600%3B700%26display%3Dswap'%3Bdocument.head.ap(fontLink)%3Blet styleEl%3D_c('style')%3BstyleEl.textContent%3D'%40keyframes tutorFadeIn%7Bfrom%7Bopacity%3A0%3Btransform%3AtranslateY(14px)%7Dto%7Bopacity%3A1%3Btransform%3AtranslateY(0)%7D%7D%40keyframes tutorPulse%7B0%25%2C100%25%7Bopacity%3A1%7D50%25%7Bopacity%3A0.3%7D%7D'%3Bdocument.head.ap(styleEl)%3Bconst F%3D%22font-family%3A'Outfit'%2Csystem-ui%2Csans-serif%3Bbox-sizing%3Aborder-box%3B%22%3Bfunction cO(html%2CtancarFn)%7Blet ov%3D_c('div')%3Bov.style.cssText%3D'position%3Afixed%3Binset%3A0%3Bbackground%3Argba(10%2C10%2C20%2C0.5)%3Bbackdrop-filter%3Ablur(6px)%3Bz-index%3A999999%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Acenter'%3Blet box%3D_c('div')%3Bbox.style.cssText%3DF%2B'background%3A%23fff%3Bborder-radius%3A20px%3Bpadding%3A36px%3Bmin-width%3A360px%3Bmax-width%3Amin(92vw%2C520px)%3Bbox-shadow%3A0 32px 80px rgba(0%2C0%2C0%2C0.18)%2C0 2px 8px rgba(0%2C0%2C0%2C0.06)%3Banimation%3AtutorFadeIn 0.22s ease'%3Bbox.innerHTML%3Dhtml%3Bov.ap(box)%3B_ba(ov)%3Bif(tancarFn)ov.addEventListener('click'%2Ce%3D>%7Bif(e.target%3D%3D%3Dov)tancarFn(ov)%3B%7D)%3Breturn ov%3B%7Dfunction cP(text)%7Blet d%3D_c('div')%3Bd.style.cssText%3DF%2B'position%3Afixed%3Btop%3A20px%3Bright%3A20px%3Bpadding%3A12px 20px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bfont-size%3A13px%3Bfont-weight%3A500%3Bborder-radius%3A100px%3Bz-index%3A999998%3Bbox-shadow%3A0 8px 28px rgba(0%2C0%2C0%2C0.22)%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A10px'%3Bd.innerHTML%3D'%3Cspan style%3D%22width%3A8px%3Bheight%3A8px%3Bborder-radius%3A50%25%3Bbackground%3A%234ade80%3Bdisplay%3Ainline-block%3Banimation%3AtutorPulse 1.2s infinite%22%3E%3C%2Fspan%3E%3Cspan id%3D%22tutorProgressText%22%3E'%2Btext%2B'%3C%2Fspan%3E'%3B_ba(d)%3Breturn d%3B%7Dfunction sP(prog%2Ct)%7Blet el%3Dprog.querySelector('%23tutorProgressText')%3Bif(el)el.textContent%3Dt%3B%7Dfunction cT(id%2Cbtn)%7Blet taula%3D_id(id)%3Bif(!taula)return%3Blet files%3Dtaula.querySelectorAll('tr')%3Blet text%3D''%3Bfiles.forEach(tr%3D>%7Blet cel%3Dtr.querySelectorAll('th%2Ctd')%3Blet fila%3DArray.from(cel).map(c%3D>c.textContent.trim()).join('%5Ct')%3Btext%2B%3Dfila%2B'%5Cn'%3B%7D)%3Bnavigator.clipboard.writeText(text).then(()%3D>%7Bbtn.textContent%3D'%E2%9C%93 Copiat!'%3Bbtn.style.background%3D'%2316a34a'%3B_st(()%3D>%7Bbtn.textContent%3D'%F0%9F%93%8B Copiar taula'%3Bbtn.style.background%3D'%230f0f1a'%3B%7D%2C2000)%3B%7D)%3B%7Dfunction mR(total%2Cmm%2Csm%2Cal)%7Blet html%3D'%3Cdiv style%3D%22'%2BF%2B'%22%3E%3Cdiv style%3D%22display%3Aflex%3Balign-items%3Aflex-start%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A24px%22%3E%3Cdiv%3E%3Ch2 style%3D%22'%2BF%2B'margin%3A0 0 4px%3Bfont-size%3A20px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3EResum de l%5C'acta%3C%2Fh2%3E%3Cp style%3D%22'%2BF%2B'margin%3A0%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E'%2Btotal%2B' alumnes processats%3C%2Fp%3E%3C%2Fdiv%3E%3Cbutton id%3D%22btnTancarRes%22 style%3D%22'%2BF%2B'width%3A34px%3Bheight%3A34px%3Bborder-radius%3A50%25%3Bborder%3Anone%3Bbackground%3A%23f3f4f6%3Bcolor%3A%236b7280%3Bfont-size%3A20px%3Bcursor%3Apointer%3Bline-height%3A1%22%3E%C3%97%3C%2Fbutton%3E%3C%2Fdiv%3E'%3Bhtml%2B%3D'%3Cdiv style%3D%22display%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A8px%22%3E%3Cp style%3D%22'%2BF%2B'font-size%3A11px%3Bfont-weight%3A700%3Bcolor%3A%239ca3af%3Btext-transform%3Auppercase%3Bletter-spacing%3A0.08em%3Bmargin%3A0%22%3EPer mat%C3%A8ria%3C%2Fp%3E%3Cbutton id%3D%22btnCopy1%22 style%3D%22'%2BF%2B'padding%3A6px 12px%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3E%F0%9F%93%8B Copiar taula%3C%2Fbutton%3E%3C%2Fdiv%3E'%3Bhtml%2B%3D'%3Cdiv style%3D%22border-radius%3A12px%3Boverflow%3Ahidden%3Bborder%3A1px solid %23f0f0f0%3Bmargin-bottom%3A20px%22%3E%3Ctable id%3D%22tutorTaula1%22 style%3D%22width%3A100%25%3Bborder-collapse%3Acollapse%22%3E%3Cthead%3E%3Ctr style%3D%22background%3A%23f9fafb%22%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Aleft%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EMAT%C3%88RIA%3C%2Fth%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3ESUSPESOS%3C%2Fth%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3E%25%3C%2Fth%3E%3C%2Ftr%3E%3C%2Fthead%3E%3Ctbody%3E'%3Bfor(let m in mm)%7Blet pct%3D(mm%5Bm%5D%2Ftotal*100).toFixed(1)%3Blet col%3Dmm%5Bm%5D%3D%3D%3D0%3F'%2316a34a'%3Amm%5Bm%5D%2Ftotal>0.3%3F'%23dc2626'%3A'%23d97706'%3Bhtml%2B%3D'%3Ctr style%3D%22border-top%3A1px solid %23f3f4f6%22%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Bfont-size%3A13px%3Bcolor%3A%23111%22%3E'%2Bm%2B'%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A'%2Bcol%2B'%22%3E'%2Bmm%5Bm%5D%2B'%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E'%2Bpct%2B'%25%3C%2Ftd%3E%3C%2Ftr%3E'%3B%7Dhtml%2B%3D'%3C%2Ftbody%3E%3C%2Ftable%3E%3C%2Fdiv%3E'%3Bhtml%2B%3D'%3Cdiv style%3D%22display%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A8px%22%3E%3Cp style%3D%22'%2BF%2B'font-size%3A11px%3Bfont-weight%3A700%3Bcolor%3A%239ca3af%3Btext-transform%3Auppercase%3Bletter-spacing%3A0.08em%3Bmargin%3A0%22%3EPer nombre de suspesos%3C%2Fp%3E%3Cbutton id%3D%22btnCopy2%22 style%3D%22'%2BF%2B'padding%3A6px 12px%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3E%F0%9F%93%8B Copiar taula%3C%2Fbutton%3E%3C%2Fdiv%3E'%3Bhtml%2B%3D'%3Cdiv style%3D%22border-radius%3A12px%3Boverflow%3Ahidden%3Bborder%3A1px solid %23f0f0f0%3Bmargin-bottom%3A20px%22%3E%3Ctable id%3D%22tutorTaula2%22 style%3D%22width%3A100%25%3Bborder-collapse%3Acollapse%22%3E%3Cthead%3E%3Ctr style%3D%22background%3A%23f9fafb%22%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EMAT. SUSPESES%3C%2Fth%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EN%C2%BA ALUMNES%3C%2Fth%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3E%25%3C%2Fth%3E%3C%2Ftr%3E%3C%2Fthead%3E%3Ctbody%3E'%3Bfor(let i%3D0%3Bi%3C%3D10%3Bi%2B%2B)%7Blet n%3DObject.values(sm).filter(x%3D>x%3D%3D%3Di).length%3Blet pct%3Dtotal>0%3F((n%2Ftotal)*100).toFixed(1)%3A'0.0'%3Blet colorN%3Dn%3D%3D%3D0%3F'%239ca3af'%3A'%230f0f1a'%3Bhtml%2B%3D'%3Ctr style%3D%22border-top%3A1px solid %23f3f4f6%22%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%23111%22%3E'%2Bi%2B'%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A'%2BcolorN%2B'%22%3E'%2Bn%2B'%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E'%2Bpct%2B'%25%3C%2Ftd%3E%3C%2Ftr%3E'%3B%7Dhtml%2B%3D'%3Ctr style%3D%22background%3A%23f9fafb%3Bborder-top%3A1px solid %23e5e7eb%22%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3ETotal%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3E'%2Btotal%2B'%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E100%25%3C%2Ftd%3E%3C%2Ftr%3E%3C%2Ftbody%3E%3C%2Ftable%3E%3C%2Fdiv%3E'%3Bif(al%26%26al.length)%7Bhtml%2B%3D'%3Cdiv style%3D%22display%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A8px%22%3E%3Cp style%3D%22'%2BF%2B'font-size%3A11px%3Bfont-weight%3A700%3Bcolor%3A%239ca3af%3Btext-transform%3Auppercase%3Bletter-spacing%3A0.08em%3Bmargin%3A0%22%3EPer alumne%3C%2Fp%3E%3Cbutton id%3D%22btnCopy3%22 style%3D%22'%2BF%2B'padding%3A6px 12px%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3E%F0%9F%93%8B Copiar taula%3C%2Fbutton%3E%3C%2Fdiv%3E'%3Bhtml%2B%3D'%3Cdiv style%3D%22border-radius%3A12px%3Boverflow%3Ahidden%3Bborder%3A1px solid %23f0f0f0%3Bmargin-bottom%3A20px%22%3E%3Ctable id%3D%22tutorTaula3%22 style%3D%22width%3A100%25%3Bborder-collapse%3Acollapse%22%3E%3Cthead%3E%3Ctr style%3D%22background%3A%23f9fafb%22%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EALUMNE%3C%2Fth%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EN%C2%BA SUSP.%3C%2Fth%3E%3Cth style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Aleft%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EMAT%C3%88RIES SUSPESES%3C%2Fth%3E%3C%2Ftr%3E%3C%2Fthead%3E%3Ctbody%3E'%3Bal.forEach(a%3D>%7Blet col%3Da.count%3D%3D%3D0%3F'%2316a34a'%3Aa.count>3%3F'%23dc2626'%3A'%23d97706'%3Bhtml%2B%3D'%3Ctr style%3D%22border-top%3A1px solid %23f3f4f6%22%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%23111%22%3E'%2Ba.num%2B'%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A'%2Bcol%2B'%22%3E'%2Ba.count%2B'%3C%2Ftd%3E%3Ctd style%3D%22'%2BF%2B'padding%3A10px 14px%3Bfont-size%3A12px%3Bcolor%3A%23374151%3Bline-height%3A1.7%22%3E'%2Ba.mats.join('%3Cbr%3E')%2B'%3C%2Ftd%3E%3C%2Ftr%3E'%3B%7D)%3Bhtml%2B%3D'%3C%2Ftbody%3E%3C%2Ftable%3E%3C%2Fdiv%3E'%3B%7Dhtml%2B%3D'%3C%2Fdiv%3E'%3Blet ov%3DcO('%3Cdiv style%3D%22max-height%3A80vh%3Boverflow-y%3Aauto%3Bpadding-right%3A4px%22%3E'%2Bhtml%2B'%3C%2Fdiv%3E'%2Co%3D>_rm(o))%3B_st(()%3D>%7Blet b%3D_id('btnTancarRes')%3Bif(b)b.onclick%3D()%3D>%7Bif(ov.parentNode)_rm(ov)%3B%7D%3Blet c1%3D_id('btnCopy1')%3Bif(c1)c1.onclick%3D()%3D>cT('tutorTaula1'%2Cc1)%3Blet c2%3D_id('btnCopy2')%3Bif(c2)c2.onclick%3D()%3D>cT('tutorTaula2'%2Cc2)%3Blet c3%3D_id('btnCopy3')%3Bif(c3)c3.onclick%3D()%3D>cT('tutorTaula3'%2Cc3)%3B%7D%2C100)%3B%7Dfunction dC(callback)%7Blet html%3D'%3Cdiv style%3D%22'%2BF%2B'text-align%3Acenter%22%3E%3Cdiv style%3D%22width%3A52px%3Bheight%3A52px%3Bbackground%3A%230f0f1a%3Bborder-radius%3A16px%3Bdisplay%3Ainline-flex%3Balign-items%3Acenter%3Bjustify-content%3Acenter%3Bfont-size%3A26px%3Bmargin-bottom%3A16px%22%3E%F0%9F%92%AC%3C%2Fdiv%3E%3Ch2 style%3D%22'%2BF%2B'margin%3A0 0 6px%3Bfont-size%3A21px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3EComentaris%3C%2Fh2%3E%3Cp style%3D%22'%2BF%2B'margin%3A0 0 20px%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3EEnganxa els comentaris (un per alumne)%3C%2Fp%3E%3Ctextarea id%3D%22tutorTA%22 placeholder%3D%22Comentari alumne 1%26%2310%3BComentari alumne 2%26%2310%3BComentari alumne 3%26%2310%3B...%22 style%3D%22'%2BF%2B'width%3A100%25%3Bheight%3A160px%3Bborder%3A1.5px solid %23e5e7eb%3Bborder-radius%3A12px%3Bpadding%3A14px%3Bfont-size%3A13px%3Bcolor%3A%230f0f1a%3Bresize%3Avertical%3Boutline%3Anone%3Bline-height%3A1.6%22%3E%3C%2Ftextarea%3E%3Cdiv style%3D%22display%3Aflex%3Bgap%3A10px%3Bmargin-top%3A16px%22%3E%3Cbutton id%3D%22btnCancelCom%22 style%3D%22'%2BF%2B'flex%3A1%3Bpadding%3A13px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3A1.5px solid %23e5e7eb%3Bborder-radius%3A12px%3Bbackground%3Atransparent%3Bcolor%3A%239ca3af%3Bcursor%3Apointer%22%3ECancel%C2%B7lar%3C%2Fbutton%3E%3Cbutton id%3D%22btnOkCom%22 style%3D%22'%2BF%2B'flex%3A2%3Bpadding%3A13px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A12px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3EContinuar %E2%86%92%3C%2Fbutton%3E%3C%2Fdiv%3E%3C%2Fdiv%3E'%3Blet ov%3DcO(html%2Cnull)%3B_st(()%3D>%7Blet ta%3D_id('tutorTA')%3Bif(ta)ta.focus()%3Blet ok%3D_id('btnOkCom')%3Bif(ok)ok.onclick%3D()%3D>%7Blet val%3Dta%3Fta.value%3A''%3Bif(ov.parentNode)_rm(ov)%3Bcallback(val)%3B%7D%3Blet ca%3D_id('btnCancelCom')%3Bif(ca)ca.onclick%3D()%3D>%7Bif(ov.parentNode)_rm(ov)%3B%7D%3B%7D%2C100)%3B%7Dlet mH%3D'%3Cdiv style%3D%22'%2BF%2B'text-align%3Acenter%22%3E%3Cdiv style%3D%22width%3A52px%3Bheight%3A52px%3Bbackground%3A%230f0f1a%3Bborder-radius%3A16px%3Bdisplay%3Ainline-flex%3Balign-items%3Acenter%3Bjustify-content%3Acenter%3Bfont-size%3A26px%3Bmargin-bottom%3A16px%22%3E%F0%9F%8E%93%3C%2Fdiv%3E%3Ch2 style%3D%22'%2BF%2B'margin%3A0 0 6px%3Bfont-size%3A21px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3EEina de Tutoria%3C%2Fh2%3E%3Cp style%3D%22'%2BF%2B'margin%3A0 0 28px%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3ESelecciona l%5C'acci%C3%B3 que vols executar%3C%2Fp%3E%3Cdiv style%3D%22display%3Aflex%3Bflex-direction%3Acolumn%3Bgap%3A10px%22%3E%3Cbutton id%3D%22btn1%22 style%3D%22'%2BF%2B'padding%3A14px 20px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A12px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A12px%22%3E%F0%9F%92%AC%3Cspan%3EComentaris de tutor%3C%2Fspan%3E%3C%2Fbutton%3E%3Cbutton id%3D%22btn2%22 style%3D%22'%2BF%2B'padding%3A14px 20px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A12px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A12px%22%3E%F0%9F%93%8B%3Cspan%3EActa de tutoria%3C%2Fspan%3E%3C%2Fbutton%3E%3Cbutton id%3D%22btn3%22 style%3D%22'%2BF%2B'padding%3A14px 20px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3A2px solid %230f0f1a%3Bborder-radius%3A12px%3Bbackground%3A%23fff%3Bcolor%3A%230f0f1a%3Bcursor%3Apointer%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A12px%22%3E%E2%9A%A1%3Cspan%3ELes dues a la vegada%3C%2Fspan%3E%3C%2Fbutton%3E%3Cbutton id%3D%22btnX%22 style%3D%22'%2BF%2B'padding%3A10px 20px%3Bfont-size%3A13px%3Bfont-weight%3A500%3Bborder%3A1.5px solid %23e5e7eb%3Bborder-radius%3A12px%3Bbackground%3Atransparent%3Bcolor%3A%239ca3af%3Bcursor%3Apointer%3Bmargin-top%3A2px%22%3ECancel%C2%B7lar%3C%2Fbutton%3E%3Cp style%3D%22font-size%3A11px%3Bcolor%3A%239ca3af%3Btext-align%3Acenter%3Bmargin-top%3A14px%3Bmargin-bottom%3A0%22%3E%C2%A9 2026 Ignasi Mart%C3%AD Palet%3C%2Fp%3E%3C%2Fdiv%3E%3C%2Fdiv%3E'%3Blet mO%3DcO(mH%2Co%3D>_rm(o))%3Bfunction tM()%7Bif(mO.parentNode)_rm(mO)%3B%7Dfunction o1()%7BtM()%3BdC(function(text)%7Bif(!text.trim())return%3Blet cm%3Dtext.split(%22%5Cn%22)%3Blet i%3D0%3Blet prog%3DcP(%22Comentaris%3A 0 %2F %22%2Bcm.length)%3Bfunction run()%7Bif(i>%3Dcm.length)%7BsP(prog%2C%22Tots els comentaris processats! %E2%9C%93%22)%3Breturn%3B%7DsP(prog%2C%22Comentaris%3A %22%2B(i%2B1)%2B%22 %2F %22%2Bcm.length)%3Blet oB%3D_q(%22a%5Bdata-ng-click%3D'showCommentsModal()'%5D%22)%3Bif(!oB)%7B_st(run%2C500)%3Breturn%3B%7DoB.click()%3Blet wM%3DsetInterval(function()%7Blet ta%3D_q(%22textarea%5Bdata-ng-model%3D'comentariGeneral.comentari'%5D%22)%3Blet sC%3D_q(%22a%5Bdata-ng-click%3D'saveComentariGeneral()'%5D%22)%3Bif(ta%26%26sC)%7BclearInterval(wM)%3Blet c%3D(cm%5Bi%5D%7C%7C%22%22).trim()%3Bif(c!%3D%3D%22%22)%7Bta.value%3Dc%3Bta.dispatchEvent(new InputEvent(%22input%22%2C%7Bbubbles%3Atrue%7D))%3BsC.click()%3B%7D_st(function()%7Blet sG%3D_q(%22a%5Bdata-ng-click%3D'saveNotesAvaluacio()'%5D%22)%3Bif(sG)sG.click()%3Blet wS%3DsetInterval(function()%7Blet alerts%3D_qa(%22.alert-success%22)%3Blet found%3Dfalse%3Balerts.forEach(function(a)%7Bif(a.innerText.toLowerCase().includes(%22desat%22))found%3Dtrue%3B%7D)%3Bif(found)%7BclearInterval(wS)%3Blet next%3D_q(%22a%5Bdata-ng-click%3D%5C%22canviAlumne('next')%5C%22%5D%22)%3Bif(!next%7C%7Cnext.disabled)%7BsP(prog%2C%22Tots els comentaris processats! %E2%9C%93%22)%3Breturn%3B%7Dangular.element(next).triggerHandler('click')%3Bi%2B%2B%3B_st(run%2C7000)%3B%7D%7D%2C500)%3B%7D%2C2000)%3B%7D%7D%2C200)%3B%7Drun()%3B%7D)%3B%7Dfunction o2()%7BtM()%3Blet total%3D0%2Cmm%3D%7B%7D%2Csm%3D%7B%7D%2CaP%3Dnew Set()%2CmC%3D%7B%7D%2Cal%3D%5B%5D%3Blet prog%3DcP(%22Alumnes%3A 0%22)%3Bfunction gS()%7Breturn Array.from(_qa(%22select%5Bdata-ng-model%3D'contingut.qualitativa'%5D%22)).filter(s%3D>s.offsetParent!%3D%3Dnull)%3B%7Dfunction pr()%7Blet selects%3DgS()%3Blet bt%3D_q(%22a.btn.btn-warning%5Bdata-ng-click%3D'showCommentsModal()'%5D%22)%3Bif(!bt)return%3Blet alumID%3Dbt.closest(%22tr%22)%3Fbt.closest(%22tr%22).textContent.trim()%3Atotal%3Bif(aP.has(alumID))return%3BaP.add(alumID)%3Blet susp%3D0%2CmatsSusp%3D%5B%5D%3Bselects.forEach(sel%3D>%7Blet tr%3Dsel.closest(%22tr%22)%3Blet td%3Dtr%3Ftr.querySelector(%22td%5Bdata-ng-if*%3D'matPNomVis'%5D%22)%3Anull%3Bif(td)%7Blet mat%3Dtd.textContent.trim()%3Blet matID%3DalumID%2B%22%7C%7C%22%2Bmat%3Bif(!mC%5BmatID%5D)%7BmC%5BmatID%5D%3Dtrue%3Blet nota%3Dsel.value.replace(%22string%3A%22%2C%22%22)%3Bif(nota%3D%3D%3D%22NA%22)%7Bmm%5Bmat%5D%3D(mm%5Bmat%5D%7C%7C0)%2B1%3Bsusp%2B%2B%3BmatsSusp.push(mat)%3B%7Delse%7Bmm%5Bmat%5D%3Dmm%5Bmat%5D%7C%7C0%3B%7D%7D%7D%7D)%3Bsm%5BalumID%5D%3Dsusp%3Bal.push(%7Bnum%3Atotal%2B1%2Ccount%3Asusp%2Cmats%3AmatsSusp%7D)%3Btotal%2B%2B%3BsP(prog%2C%22Alumnes%3A %22%2Btotal)%3B%7Dfunction sg()%7Blet next%3D_q(%22a%5Bdata-ng-click%3D%5C%22canviAlumne('next')%5C%22%5D%22)%3Bif(next%26%26!next.hasAttribute(%22disabled%22))%7Bangular.element(next).triggerHandler('click')%3Breturn true%3B%7Dreturn false%3B%7Dfunction eE(cb)%7Blet lC%3D0%2CsT%3D0%3Blet int%3DsetInterval(()%3D>%7Blet count%3DgS().length%3Blet bt%3D_q(%22a.btn.btn-warning%5Bdata-ng-click%3D'showCommentsModal()'%5D%22)%3Bif(bt%26%26count%3D%3D%3DlC%26%26count>0)%7BsT%2B%3D100%3Bif(sT>%3D500)%7BclearInterval(int)%3Bcb()%3B%7D%7Delse%7BsT%3D0%3BlC%3Dcount%3B%7D%7D%2C100)%3B%7Dfunction acabar()%7BsP(prog%2C%22Processament complet! %E2%9C%93%22)%3BmR(total%2Cmm%2Csm%2Cal)%3B%7Dfunction loop()%7BeE(()%3D>%7Bpr()%3Bif(sg())%7B_st(loop%2C150)%3B%7Delse%7Bacabar()%3B%7D%7D)%3B%7Dloop()%3B%7Dfunction o3()%7BtM()%3BdC(function(text)%7Bif(!text.trim())return%3Blet cm%3Dtext.split(%22%5Cn%22)%3Blet i%3D0%3Blet total%3D0%2Cmm%3D%7B%7D%2Csm%3D%7B%7D%2CaP%3Dnew Set()%2CmC%3D%7B%7D%2Cal%3D%5B%5D%3Blet prog%3DcP(%22Processant%3A 0 %2F %22%2Bcm.length)%3Bfunction gS()%7Breturn Array.from(_qa(%22select%5Bdata-ng-model%3D'contingut.qualitativa'%5D%22)).filter(s%3D>s.offsetParent!%3D%3Dnull)%3B%7Dfunction pD()%7Blet selects%3DgS()%3Blet bt%3D_q(%22a.btn.btn-warning%5Bdata-ng-click%3D'showCommentsModal()'%5D%22)%3Bif(!bt)return%3Blet alumID%3Dbt.closest(%22tr%22)%3Fbt.closest(%22tr%22).textContent.trim()%3Atotal%3Bif(aP.has(alumID))return%3BaP.add(alumID)%3Blet susp%3D0%2CmatsSusp%3D%5B%5D%3Bselects.forEach(sel%3D>%7Blet tr%3Dsel.closest(%22tr%22)%3Blet td%3Dtr%3Ftr.querySelector(%22td%5Bdata-ng-if*%3D'matPNomVis'%5D%22)%3Anull%3Bif(td)%7Blet mat%3Dtd.textContent.trim()%3Blet matID%3DalumID%2B%22%7C%7C%22%2Bmat%3Bif(!mC%5BmatID%5D)%7BmC%5BmatID%5D%3Dtrue%3Blet nota%3Dsel.value.replace(%22string%3A%22%2C%22%22)%3Bif(nota%3D%3D%3D%22NA%22)%7Bmm%5Bmat%5D%3D(mm%5Bmat%5D%7C%7C0)%2B1%3Bsusp%2B%2B%3BmatsSusp.push(mat)%3B%7Delse%7Bmm%5Bmat%5D%3Dmm%5Bmat%5D%7C%7C0%3B%7D%7D%7D%7D)%3Bsm%5BalumID%5D%3Dsusp%3Bal.push(%7Bnum%3Atotal%2B1%2Ccount%3Asusp%2Cmats%3AmatsSusp%7D)%3Btotal%2B%2B%3B%7Dfunction eE(cb)%7Blet lC%3D0%2CsT%3D0%3Blet int%3DsetInterval(()%3D>%7Blet count%3DgS().length%3Blet bt%3D_q(%22a.btn.btn-warning%5Bdata-ng-click%3D'showCommentsModal()'%5D%22)%3Bif(bt%26%26count%3D%3D%3DlC%26%26count>0)%7BsT%2B%3D100%3Bif(sT>%3D500)%7BclearInterval(int)%3Bcb()%3B%7D%7Delse%7BsT%3D0%3BlC%3Dcount%3B%7D%7D%2C100)%3B%7Dfunction aA()%7BsP(prog%2C%22Tot processat! %E2%9C%93%22)%3BmR(total%2Cmm%2Csm%2Cal)%3B%7Dfunction dP(last)%7B_st(function()%7Blet sG%3D_q(%22a%5Bdata-ng-click%3D'saveNotesAvaluacio()'%5D%22)%3Bif(sG)sG.click()%3Blet wS%3DsetInterval(function()%7Blet alerts%3D_qa(%22.alert-success%22)%3Blet found%3Dfalse%3Balerts.forEach(function(a)%7Bif(a.innerText.toLowerCase().includes(%22desat%22))found%3Dtrue%3B%7D)%3Bif(found)%7BclearInterval(wS)%3Bif(last)%7BaA()%3Breturn%3B%7Dlet next%3D_q(%22a%5Bdata-ng-click%3D%5C%22canviAlumne('next')%5C%22%5D%22)%3Bif(!next%7C%7Cnext.hasAttribute(%22disabled%22))%7BaA()%3Breturn%3B%7Dangular.element(next).triggerHandler('click')%3Bi%2B%2B%3B_st(rC%2C7000)%3B%7D%7D%2C500)%3B%7D%2C2000)%3B%7Dfunction eC(last)%7Blet c%3D(cm%5Bi%5D%7C%7C%22%22).trim()%3Bif(c%3D%3D%3D%22%22)%7BdP(last)%3Breturn%3B%7Dlet oB%3D_q(%22a%5Bdata-ng-click%3D'showCommentsModal()'%5D%22)%3Bif(!oB)%7B_st(()%3D>eC(last)%2C500)%3Breturn%3B%7DoB.click()%3Blet wM%3DsetInterval(function()%7Blet ta%3D_q(%22textarea%5Bdata-ng-model%3D'comentariGeneral.comentari'%5D%22)%3Blet sC%3D_q(%22a%5Bdata-ng-click%3D'saveComentariGeneral()'%5D%22)%3Bif(ta%26%26sC)%7BclearInterval(wM)%3Bta.value%3Dc%3Bta.dispatchEvent(new InputEvent(%22input%22%2C%7Bbubbles%3Atrue%7D))%3BsC.click()%3BdP(last)%3B%7D%7D%2C200)%3B%7Dfunction rC()%7BsP(prog%2C%22Processant%3A %22%2B(i%2B1)%2B%22 %2F %22%2Bcm.length)%3BeE(()%3D>%7BpD()%3Blet next%3D_q(%22a%5Bdata-ng-click%3D%5C%22canviAlumne('next')%5C%22%5D%22)%3Blet isLast%3D!next%7C%7Cnext.hasAttribute(%22disabled%22)%3BeC(isLast)%3B%7D)%3B%7DrC()%3B%7D)%3B%7D_id(%22btn1%22).onclick%3Do1%3B_id(%22btn2%22).onclick%3Do2%3B_id(%22btn3%22).onclick%3Do3%3B_id(%22btnX%22).onclick%3DtM%3B%7Delse if(isM)%7Bif(_id('esfera-overlay'))return%3Bconst ov%3D_c('div')%3Bov.id%3D'esfera-overlay'%3Bov.style.cssText%3D'position%3Afixed%3Btop%3A0%3Bleft%3A0%3Bwidth%3A100%25%3Bheight%3A100%25%3Bbackground%3Argba(0%2C0%2C0%2C0.45)%3Bz-index%3A99999%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Acenter%3B'%3Bconst md%3D_c('div')%3Bmd.style.cssText%3D'background%3A%23fff%3Bborder-radius%3A12px%3Bpadding%3A24px%3Bwidth%3A420px%3Bmax-width%3A90vw%3Bmax-height%3A85vh%3Boverflow-y%3Aauto%3Bfont-family%3Asans-serif%3Bcolor%3A%23111%3Bbox-sizing%3Aborder-box%3B'%3Bfunction close()%7Bov.remove()%3B%7Dov.addEventListener('click'%2Ce%3D>%7Bif(e.target%3D%3D%3Dov)close()%3B%7D)%3Bfunction gR()%7Breturn Array.from(_qa('%23my-tab-content tbody tr')).filter(r%3D>%7Bconst s%3Dr.querySelector('td%3Anth-child(6)>div>div>select')%3Bconst td%3Dr.querySelector('td%3Anth-child(1)')%3Breturn s%26%26!s.disabled%26%26!(td%26%26td.classList.contains('cursiva'))%3B%7D)%3B%7Dfunction gN(row)%7Bconst td%3Drow.querySelector('td%3Anth-child(2)')%3Breturn td%3Ftd.textContent.trim()%3A''%3B%7Dfunction rN(row)%7Bconst s%3Drow.querySelector('td%3Anth-child(6)>div>div>select')%3Breturn s%26%26s.value%26%26s.value!%3D%3D''%26%26s.value!%3D%3D'string%3A'%3B%7Dfunction rCm(row)%7Bconst btn%3Drow.querySelector('a.glyphicon.glyphicon-new-window')%3Bif(!btn)return false%3Bconst td%3Dbtn.closest('td')%3Bif(!td)return false%3Bif(td.querySelector('.badge%2C.label%2Cspan%5Bclass*%3D%22comment%22%5D%2Cspan%5Bclass*%3D%22count%22%5D'))return true%3Bconst txt%3DArray.from(td.childNodes).filter(n%3D>n.nodeType%3D%3D%3D3).map(n%3D>n.textContent.trim()).join('')%3Bif(%2F%5Cd%2B%2F.test(txt))return true%3Bif(btn.classList.length>2)return true%3Bif(btn.getAttribute('title')%7C%7Cbtn.getAttribute('data-original-title'))return true%3Breturn false%3B%7Dfunction hN()%7Breturn gR().some(rN)%3B%7Dfunction hC()%7Breturn gR().some(rCm)%3B%7Dfunction aN(text%2Cidx2%2CwM)%7Bconst grades%3Dtext.split('%5Cn').map(s%3D>s.split('%5Ct'))%3Bconst rows%3DgR()%3Bconst tg%3Didx2!%3D%3Dnull%3Fidx2.map(i%3D>rows%5Bi%5D)%3Arows%3Bconst sk%3D%5B%5D%3Bfor(let i%3D0%3Bi<grades.length%26%26i<tg.length%3Bi%2B%2B)%7Bconst row%3Dtg%5Bi%5D%3Bif(!row)continue%3Bif(wM%3D%3D%3D'skip'%26%26rN(row))%7Bsk.push(gN(row))%3Bcontinue%3B%7Dconst sg%3Dgrades%5Bi%5D%3Bfor(let j%3D0%3Bj<sg.length%3Bj%2B%2B)%7Bif(sg%5Bj%5D!%3D%3D'')%7Bconst sel%3Drow.querySelector(%60td%3Anth-child(%24%7B6%2Bj%7D)>div>div>select%60)%3Bif(sel)%7Bsel.value%3D'string%3A'%2Bsg%5Bj%5D.trim()%3Bsel.dispatchEvent(new Event('change'))%3B%7D%7D%7D%7Dreturn sk%3B%7Dfunction aC(text%2Cidx2%2CwM%2Ccb)%7Bconst cm%3Dtext.split('%5Cn')%3Bconst rows%3DgR()%3Bconst tg%3Didx2!%3D%3Dnull%3Fidx2.map(i%3D>rows%5Bi%5D)%3Arows%3Bconst sk%3D%5B%5D%3Bfunction next(i)%7Bif(i>%3Dcm.length%7C%7Ci>%3Dtg.length)%7Bcb(sk)%3Breturn%3B%7Dconst row%3Dtg%5Bi%5D%3Bif(!row)%7Bnext(i%2B1)%3Breturn%3B%7Dif(wM%3D%3D%3D'skip'%26%26rCm(row))%7Bsk.push(gN(row))%3Bnext(i%2B1)%3Breturn%3B%7Dconst btn%3Drow.querySelector('a.glyphicon.glyphicon-new-window')%3Bif(!btn)%7Bnext(i%2B1)%3Breturn%3B%7Dbtn.click()%3B_st(()%3D>%7Bconst ta%3D_q('textarea.form-control')%3Bconst save%3D_q('a.btn.btn-primary%5Bdata-ng-click%3D%22vm.modalSave()%22%5D')%3Bif(!ta%7C%7C!save)%7Bnext(i)%3Breturn%3B%7Dta.value%3Dcm%5Bi%5D%3Bta.dispatchEvent(new InputEvent('input'%2C%7Bbubbles%3Atrue%2CinputType%3A'insertText'%2Cdata%3Acm%5Bi%5D%7D))%3Bsave.click()%3B_st(()%3D>next(i%2B1)%2C500)%3B%7D%2C500)%3B%7Dnext(0)%3B%7Dconst clrs%3D%7Bnotes%3A'%234e7f4e'%2Ccomentaris%3A'%233d6b9e'%2Cambdos%3A'%237a4e9e'%7D%3Bconst lbls%3D%7Bnotes%3A'Aplicar notes'%2Ccomentaris%3A'Aplicar comentaris'%2Cambdos%3A'Aplicar notes i comentaris'%7D%3Bfunction mkBtn(txt%2Cbg%2Cfn)%7Bconst b%3D_c('button')%3Bb.textContent%3Dtxt%3Bb.style.cssText%3D%60display%3Ablock%3Bwidth%3A100%25%3Bpadding%3A12px 16px%3Bmargin-bottom%3A8px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%24%7Bbg%7D%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3Btext-align%3Aleft%3B%60%3Bb.onclick%3Dfn%3Breturn b%3B%7Dfunction mkCancel(txt%2Cfn)%7Bconst b%3D_c('button')%3Bb.textContent%3Dtxt%7C%7C'Cancel%C2%B7lar'%3Bb.style.cssText%3D'width%3A100%25%3Bpadding%3A9px%3Bborder%3A1px solid %23ccc%3Bborder-radius%3A8px%3Bbackground%3Atransparent%3Bfont-size%3A13px%3Bcursor%3Apointer%3Bcolor%3A%23666%3Bmargin-top%3A4px%3B'%3Bb.onclick%3Dfn%7C%7Cclose%3Breturn b%3B%7Dfunction mkBack(fn)%7Bconst b%3D_c('button')%3Bb.textContent%3D'%E2%86%90 Tornar'%3Bb.style.cssText%3D'background%3Anone%3Bborder%3Anone%3Bcolor%3A%23666%3Bfont-size%3A13px%3Bcursor%3Apointer%3Bpadding%3A0%3Bmargin-bottom%3A16px%3Bdisplay%3Ablock%3B'%3Bb.onclick%3Dfn%3Breturn b%3B%7Dfunction mkLbl(txt)%7Bconst l%3D_c('label')%3Bl.textContent%3Dtxt%3Bl.style.cssText%3D'display%3Ablock%3Bfont-weight%3A500%3Bfont-size%3A13px%3Bcolor%3A%23555%3Bmargin-bottom%3A4px%3B'%3Breturn l%3B%7Dfunction mkTA(ph)%7Bconst t%3D_c('textarea')%3Bt.placeholder%3Dph%3Bt.style.cssText%3D'width%3A100%25%3Bheight%3A80px%3Bbox-sizing%3Aborder-box%3Bborder%3A1px solid %23ccc%3Bborder-radius%3A6px%3Bpadding%3A6px 8px%3Bfont-size%3A12px%3Bfont-family%3Amonospace%3Bmargin-bottom%3A12px%3Bresize%3Avertical%3B'%3Breturn t%3B%7Dfunction sS(skN%2CskC)%7Bconst allNames%3D%5B...new Set(%5B...skN%2C...skC%5D)%5D%3Bif(!allNames.length)%7Bclose()%3Breturn%3B%7Dmd.innerHTML%3D''%3Bconst ic%3D_c('div')%3Bic.textContent%3D'%E2%9A%A0'%3Bic.style.cssText%3D'font-size%3A26px%3Bmargin-bottom%3A8px%3B'%3Bmd.ap(ic)%3Bconst h%3D_c('p')%3Bh.style.cssText%3D'font-weight%3A500%3Bfont-size%3A15px%3Bmargin%3A0 0 6px%3B'%3Bh.textContent%3D'Alumnes no modificats'%3Bmd.ap(h)%3Bconst setN%3Dnew Set(skN)%3Bconst setC%3Dnew Set(skC)%3Bconst parts%3D%5B%5D%3Bif(skN.length)parts.push('notes')%3Bif(skC.length)parts.push('comentaris')%3Bconst sub%3D_c('p')%3Bsub.style.cssText%3D'font-size%3A13px%3Bcolor%3A%23666%3Bmargin%3A0 0 12px%3Bline-height%3A1.5%3B'%3Bsub.textContent%3D%60Els alumnes seg%C3%BCents ja tenien %24%7Bparts.join(' o ')%7D i no s'han sobreescrit%3A%60%3Bmd.ap(sub)%3Bconst ul%3D_c('ul')%3Bul.style.cssText%3D'font-size%3A13px%3Bmargin%3A0 0 16px%3Bpadding-left%3A18px%3Bline-height%3A1.9%3Bmax-height%3A200px%3Boverflow-y%3Aauto%3B'%3BallNames.forEach(name%3D>%7Bconst li%3D_c('li')%3Bconst tags%3D%5B%5D%3Bif(setN.has(name))tags.push('notes')%3Bif(setC.has(name))tags.push('comentaris')%3Bli.textContent%3D%60%24%7Bname%7D (%24%7Btags.join('%2C ')%7D)%60%3Bul.ap(li)%3B%7D)%3Bmd.ap(ul)%3Bconst ok%3D_c('button')%3Bok.textContent%3D'Tancar'%3Bok.style.cssText%3D'width%3A100%25%3Bpadding%3A11px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%23555%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3B'%3Bok.onclick%3Dclose%3Bmd.ap(ok)%3B%7Dfunction sF(mode%2Cidx2%2CwM)%7Bmd.innerHTML%3D''%3Bmd.ap(mkBack(()%3D>sPk(mode%2CwM)))%3Blet nTA%3Dnull%2CcTA%3Dnull%3Bif(mode%3D%3D%3D'notes'%7C%7Cmode%3D%3D%3D'ambdos')%7Bmd.ap(mkLbl('Notes'))%3BnTA%3DmkTA(%22Enganxa les notes des d'Excel%22)%3Bmd.ap(nTA)%3B%7Dif(mode%3D%3D%3D'comentaris'%7C%7Cmode%3D%3D%3D'ambdos')%7Bmd.ap(mkLbl('Comentaris'))%3BcTA%3DmkTA('Enganxa els comentaris (un per l%C3%ADnia)')%3Bmd.ap(cTA)%3B%7Dconst ap%3D_c('button')%3Bap.textContent%3Dlbls%5Bmode%5D%3Bap.style.cssText%3D%60width%3A100%25%3Bpadding%3A11px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%24%7Bclrs%5Bmode%5D%7D%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3B%60%3Bap.onclick%3D()%3D>%7Bconst skN%3DnTA%3FaN(nTA.value%2Cidx2%2CwM)%3A%5B%5D%3Bif(cTA)%7BaC(cTA.value%2Cidx2%2CwM%2CskC%3D>sS(skN%2CskC))%3B%7Delse%7BsS(skN%2C%5B%5D)%3B%7D%7D%3Bmd.ap(ap)%3B%7Dfunction sPk(mode%2CwM)%7Bmd.innerHTML%3D''%3Bmd.ap(mkBack(()%3D>sSc(mode%2CwM)))%3Bconst rows%3DgR()%3Bconst h%3D_c('p')%3Bh.textContent%3D'Selecciona els alumnes'%3Bh.style.cssText%3D'font-weight%3A500%3Bfont-size%3A15px%3Bmargin%3A0 0 10px%3B'%3Bmd.ap(h)%3Bconst sr%3D_c('div')%3Bsr.style.cssText%3D'display%3Aflex%3Bgap%3A8px%3Bmargin-bottom%3A8px%3B'%3Bconst sA%3D_c('button')%3BsA.textContent%3D'Tots'%3BsA.style.cssText%3D'flex%3A1%3Bpadding%3A5px%3Bborder%3A1px solid %23ccc%3Bborder-radius%3A6px%3Bbackground%3Atransparent%3Bfont-size%3A12px%3Bcursor%3Apointer%3B'%3Bconst sN%3D_c('button')%3BsN.textContent%3D'Cap'%3BsN.style.cssText%3D'flex%3A1%3Bpadding%3A5px%3Bborder%3A1px solid %23ccc%3Bborder-radius%3A6px%3Bbackground%3Atransparent%3Bfont-size%3A12px%3Bcursor%3Apointer%3B'%3Bsr.ap(sA)%3Bsr.ap(sN)%3Bmd.ap(sr)%3Bconst ld%3D_c('div')%3Bld.style.cssText%3D'max-height%3A220px%3Boverflow-y%3Aauto%3Bborder%3A1px solid %23eee%3Bborder-radius%3A6px%3Bmargin-bottom%3A12px%3B'%3Bconst cbs%3D%5B%5D%3Brows.forEach((row%2Ci)%3D>%7Bconst name%3DgN(row)%7C%7C%60Alumne %24%7Bi%2B1%7D%60%3Bconst item%3D_c('label')%3Bitem.style.cssText%3D'display%3Aflex%3Balign-items%3Acenter%3Bgap%3A8px%3Bpadding%3A7px 10px%3Bcursor%3Apointer%3Bborder-bottom%3A1px solid %23f5f5f5%3Bfont-size%3A13px%3B'%3Bconst cb%3D_c('input')%3Bcb.type%3D'checkbox'%3Bcb.checked%3Dtrue%3Bcbs.push(cb)%3Bitem.ap(cb)%3Bitem.ap(document.createTextNode(name))%3Bld.ap(item)%3B%7D)%3Bmd.ap(ld)%3BsA.onclick%3D()%3D>cbs.forEach(c%3D>c.checked%3Dtrue)%3BsN.onclick%3D()%3D>cbs.forEach(c%3D>c.checked%3Dfalse)%3Bconst ap%3D_c('button')%3Bap.textContent%3D'Continuar'%3Bap.style.cssText%3D%60width%3A100%25%3Bpadding%3A11px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%24%7Bclrs%5Bmode%5D%7D%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3B%60%3Bap.onclick%3D()%3D>%7Bconst idx%3Dcbs.map((c%2Ci)%3D>c.checked%3Fi%3Anull).filter(i%3D>i!%3D%3Dnull)%3Bif(!idx.length)return%3BsF(mode%2Cidx%2CwM)%3B%7D%3Bmd.ap(ap)%3B%7Dfunction sSc(mode%2CwM)%7Bmd.innerHTML%3D''%3Bmd.ap(mkBack(sCh))%3Bconst h%3D_c('p')%3Bh.textContent%3D'A quins alumnes%3F'%3Bh.style.cssText%3D'font-weight%3A500%3Bfont-size%3A16px%3Bmargin%3A0 0 16px%3B'%3Bmd.ap(h)%3Bmd.ap(mkBtn('Tots els alumnes del grup'%2Cclrs%5Bmode%5D%2C()%3D>sF(mode%2Cnull%2CwM)))%3Bmd.ap(mkBtn('Escollir alumnes'%2C'%23888'%2C()%3D>sPk(mode%2CwM)))%3B%7Dfunction sW(msg%2Cmode)%7Bmd.innerHTML%3D''%3Bmd.ap(mkBack(sCh))%3Bconst ic%3D_c('div')%3Bic.textContent%3D'%E2%9A%A0'%3Bic.style.cssText%3D'font-size%3A28px%3Bmargin-bottom%3A8px%3B'%3Bmd.ap(ic)%3Bconst h%3D_c('p')%3Bh.style.cssText%3D'font-weight%3A500%3Bfont-size%3A15px%3Bmargin%3A0 0 8px%3B'%3Bh.textContent%3D'Ja hi ha dades existents'%3Bmd.ap(h)%3Bconst s%3D_c('p')%3Bs.style.cssText%3D'font-size%3A13px%3Bcolor%3A%23666%3Bmargin%3A0 0 16px%3Bline-height%3A1.5%3B'%3Bs.textContent%3Dmsg%3Bmd.ap(s)%3Bmd.ap(mkBtn('Reescriure tot'%2C'%23c0392b'%2C()%3D>sSc(mode%2C'overwrite')))%3Bmd.ap(mkBtn('No sobreescriure els que ja en tenen'%2C'%23e67e22'%2C()%3D>sSc(mode%2C'skip')))%3Bmd.ap(mkCancel('Cancel%C2%B7lar'%2Cclose))%3B%7Dfunction cAS(mode)%7Bconst nWarn%3D(mode%3D%3D%3D'notes'%7C%7Cmode%3D%3D%3D'ambdos')%26%26hN()%3Bconst cWarn%3D(mode%3D%3D%3D'comentaris'%7C%7Cmode%3D%3D%3D'ambdos')%26%26hC()%3Bconst parts%3D%5B%5D%3Bif(nWarn)parts.push('notes')%3Bif(cWarn)parts.push('comentaris')%3Bif(parts.length)%7BsW(%60Ja hi ha %24%7Bparts.join(' i ')%7D introdu%C3%AFts.%60%2Cmode)%3B%7Delse%7BsSc(mode%2C'overwrite')%3B%7D%7Dfunction sCh()%7Bmd.innerHTML%3D''%3Bconst h%3D_c('p')%3Bh.style.cssText%3D'font-weight%3A500%3Bfont-size%3A16px%3Bmargin%3A0 0 16px%3B'%3Bh.textContent%3D'Qu%C3%A8 vols fer%3F'%3Bmd.ap(h)%3Bmd.ap(mkBtn('Posar notes'%2C'%234e7f4e'%2C()%3D>cAS('notes')))%3Bmd.ap(mkBtn('Posar comentaris'%2C'%233d6b9e'%2C()%3D>cAS('comentaris')))%3Bmd.ap(mkBtn('Posar notes i comentaris'%2C'%237a4e9e'%2C()%3D>cAS('ambdos')))%3Bmd.ap(mkCancel())%3Bconst cr%3D_c('p')%3Bcr.textContent%3D'%C2%A9 2026 Ignasi Mart%C3%AD Palet'%3Bcr.style.cssText%3D'font-size%3A11px%3Bcolor%3A%239ca3af%3Btext-align%3Acenter%3Bmargin-top%3A14px%3Bmargin-bottom%3A0'%3Bmd.ap(cr)%3B%7DsCh()%3Bov.ap(md)%3B_ba(ov)%3B%7Delse%7Balert('%E2%9A%A0%EF%B8%8F Aquest bookmarklet nom%C3%A9s funciona a%3A%5Cn%E2%80%A2 Qualificacions per grup i mat%C3%A8ria%5Cn%E2%80%A2 Qualificacions per grup i alumne%2Fa')%3B%7D%7D)()%3B">
+        <span class="icon">🎓</span>
+        Assistent Esfer@
+      </a>
+    </div>
+  </section>
+
+  <section class="steps">
+    <p class="steps-title">Com instal·lar-lo</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Mostra la barra</h3>
+        <p>Si no veus la barra de marcadors, activa-la amb <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Windows/Linux) o <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac).</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Arrossega el botó</h3>
+        <p>Agafa el botó negre i arrossega'l fins a la barra de marcadors del teu navegador. Veuràs un indicador mentre l'arrossegues.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Ja funciona!</h3>
+        <p>Ves a <strong>Qualificacions per grup i matèria</strong> per posar notes i comentaris, o a <strong>Qualificacions per grup i alumne/a</strong> per posar comentaris de tutor i fer l'acta d'avaluació de la tutoria. Fes clic al marcador per activar l'eina.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="compat">
+    <div class="compat-inner">
+      <span class="compat-icon">🌐</span>
+      <div>
+        <h3>Compatibilitat</h3>
+        <p>Funciona a Chrome, Firefox, Edge i Safari. Ves a <strong>Qualificacions per grup i matèria</strong> per posar notes i comentaris, o a <strong>Qualificacions per grup i alumne/a</strong> per posar comentaris de tutor i fer l'acta d'avaluació de la tutoria.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 Ignasi Martí Palet</p>
+  <p>Assistent Esfer@ · Bookmarklet</p>
+</footer>
+
+
+<script>
+  // ════════════════════════════════════════════
+  // CONFIGURACIÓ — omple aquests dos valors
+  // ════════════════════════════════════════════
+  const BIN_ID  = "POSA_AQUI_EL_TEU_BIN_ID";
+  const API_KEY = "POSA_AQUI_LA_TEVA_SECRET_KEY";
+  // ════════════════════════════════════════════
+  // CONTRASENYA D'ADMINISTRADOR — només la saps tu
+  const ADMIN_PWD = "POSA_AQUI_LA_TEVA_CONTRASENYA_ADMIN";
+  // ════════════════════════════════════════════
+
+  const contingut = document.querySelector('main');
+  const cap = document.querySelector('header');
+  const peu = document.querySelector('footer');
+  contingut.style.display = 'none';
+  cap.style.display = 'none';
+  peu.style.display = 'none';
+
+  function mostrar() {
+    contingut.style.display = '';
+    cap.style.display = '';
+    peu.style.display = '';
+    afegirBotoAdmin();
+  }
+
+  // ── Llegeix la contrasenya de JSONbin ──
+  async function obtenirContrasenya() {
+    try {
+      const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': API_KEY }
+      });
+      const d = await r.json();
+      return d.record.contrasenya;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  // ── Actualitza la contrasenya a JSONbin ──
+  async function actualitzarContrasenya(nova) {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+      body: JSON.stringify({ contrasenya: nova })
+    });
+    return r.ok;
+  }
+
+  // ── Pantalla d'accés d'usuari ──
+  function mostrarPantalla(contrasenya) {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:#f7f6f2;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:"Instrument Sans",sans-serif;';
+    ov.innerHTML = `
+      <div style="background:#fff;border:1px solid #e2e1dc;border-radius:20px;padding:40px 36px;width:340px;max-width:90vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.08)">
+        <div style="font-size:36px;margin-bottom:16px">🔒</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#0f0f1a;margin-bottom:6px">Accés restringit</h2>
+        <p style="font-size:13px;color:#9898a8;margin-bottom:24px;line-height:1.5">Introdueix la contrasenya per accedir al bookmarklet</p>
+        <input id="pwd-input" type="password" placeholder="Contrasenya"
+          style="width:100%;padding:12px 14px;border:1.5px solid #e2e1dc;border-radius:10px;font-size:14px;outline:none;font-family:'Instrument Sans',sans-serif;color:#0f0f1a;box-sizing:border-box;margin-bottom:10px;"
+          onkeydown="if(event.key==='Enter')document.getElementById('pwd-btn').click()"
+        />
+        <p id="pwd-error" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:8px"></p>
+        <button id="pwd-btn" style="width:100%;padding:13px;border:none;border-radius:10px;background:#0f0f1a;color:#fff;font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Entrar →</button>
+      </div>`;
+    document.body.appendChild(ov);
+    setTimeout(() => document.getElementById('pwd-input').focus(), 100);
+    document.getElementById('pwd-btn').addEventListener('click', () => {
+      if (document.getElementById('pwd-input').value === contrasenya) {
+        sessionStorage.setItem('auth', 'ok');
+        ov.remove();
+        mostrar();
+      } else {
+        document.getElementById('pwd-error').textContent = 'Contrasenya incorrecta. Torna-ho a intentar.';
+        document.getElementById('pwd-input').value = '';
+        document.getElementById('pwd-input').focus();
+      }
+    });
+  }
+
+  // ── Pantalla de càrrega mentre consulta JSONbin ──
+  function mostrarCarregant() {
+    const ov = document.createElement('div');
+    ov.id = 'loading-ov';
+    ov.style.cssText = 'position:fixed;inset:0;background:#f7f6f2;display:flex;align-items:center;justify-content:center;z-index:9999;';
+    ov.innerHTML = `<p style="font-family:'Instrument Sans',sans-serif;font-size:14px;color:#9898a8;">Carregant...</p>`;
+    document.body.appendChild(ov);
+    return ov;
+  }
+
+  // ── Botó discret d'administrador al peu ──
+  function afegirBotoAdmin() {
+    const btn = document.createElement('button');
+    btn.textContent = '⚙';
+    btn.title = 'Administrador';
+    btn.style.cssText = 'position:fixed;bottom:16px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid #e2e1dc;background:#fff;color:#ccc;font-size:14px;cursor:pointer;z-index:8888;transition:color 0.2s;';
+    btn.onmouseenter = () => btn.style.color = '#0f0f1a';
+    btn.onmouseleave = () => btn.style.color = '#ccc';
+    btn.onclick = () => mostrarPanellAdmin();
+    document.body.appendChild(btn);
+  }
+
+  // ── Panell d'administrador ──
+  function mostrarPanellAdmin() {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:"Instrument Sans",sans-serif;';
+    ov.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:36px;width:340px;max-width:90vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.15)">
+        <div style="font-size:32px;margin-bottom:12px">⚙️</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#0f0f1a;margin-bottom:6px">Zona d'administrador</h2>
+        <p style="font-size:13px;color:#9898a8;margin-bottom:20px;line-height:1.5">Introdueix la contrasenya d'administrador</p>
+        <input id="admin-input" type="password" placeholder="Contrasenya d'administrador"
+          style="width:100%;padding:12px 14px;border:1.5px solid #e2e1dc;border-radius:10px;font-size:14px;outline:none;font-family:'Instrument Sans',sans-serif;color:#0f0f1a;box-sizing:border-box;margin-bottom:10px;"
+          onkeydown="if(event.key==='Enter')document.getElementById('admin-btn').click()"
+        />
+        <p id="admin-error" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:8px"></p>
+        <div style="display:flex;gap:8px">
+          <button onclick="this.closest('div').parentElement.parentElement.remove()" style="flex:1;padding:11px;border:1.5px solid #e2e1dc;border-radius:10px;background:transparent;font-size:13px;cursor:pointer;color:#9898a8;">Cancel·lar</button>
+          <button id="admin-btn" style="flex:2;padding:11px;border:none;border-radius:10px;background:#0f0f1a;color:#fff;font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Entrar →</button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    setTimeout(() => document.getElementById('admin-input').focus(), 100);
+
+    document.getElementById('admin-btn').addEventListener('click', () => {
+      if (document.getElementById('admin-input').value === ADMIN_PWD) {
+        ov.remove();
+        mostrarCanviContrasenya();
+      } else {
+        document.getElementById('admin-error').textContent = 'Contrasenya incorrecta.';
+        document.getElementById('admin-input').value = '';
+        document.getElementById('admin-input').focus();
+      }
+    });
+  }
+
+  // ── Panell de canvi de contrasenya ──
+  function mostrarCanviContrasenya() {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:"Instrument Sans",sans-serif;';
+    ov.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:36px;width:340px;max-width:90vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.15)">
+        <div style="font-size:32px;margin-bottom:12px">🔑</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#0f0f1a;margin-bottom:6px">Canviar contrasenya</h2>
+        <p style="font-size:13px;color:#9898a8;margin-bottom:20px;line-height:1.5">Escriu la nova contrasenya pels usuaris</p>
+        <input id="nova-pwd" type="text" placeholder="Nova contrasenya"
+          style="width:100%;padding:12px 14px;border:1.5px solid #e2e1dc;border-radius:10px;font-size:14px;outline:none;font-family:'Instrument Sans',sans-serif;color:#0f0f1a;box-sizing:border-box;margin-bottom:10px;"
+        />
+        <p id="canvi-msg" style="font-size:12px;min-height:18px;margin-bottom:8px"></p>
+        <div style="display:flex;gap:8px">
+          <button onclick="this.closest('div').parentElement.parentElement.remove()" style="flex:1;padding:11px;border:1.5px solid #e2e1dc;border-radius:10px;background:transparent;font-size:13px;cursor:pointer;color:#9898a8;">Cancel·lar</button>
+          <button id="canvi-btn" style="flex:2;padding:11px;border:none;border-radius:10px;background:#2a7d4f;color:#fff;font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Guardar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    setTimeout(() => document.getElementById('nova-pwd').focus(), 100);
+
+    document.getElementById('canvi-btn').addEventListener('click', async () => {
+      const nova = document.getElementById('nova-pwd').value.trim();
+      const msg = document.getElementById('canvi-msg');
+      if (!nova) { msg.style.color = '#dc2626'; msg.textContent = 'Escriu una contrasenya.'; return; }
+      document.getElementById('canvi-btn').textContent = 'Guardant...';
+      document.getElementById('canvi-btn').disabled = true;
+      const ok = await actualitzarContrasenya(nova);
+      if (ok) {
+        msg.style.color = '#2a7d4f';
+        msg.textContent = '✓ Contrasenya actualitzada!';
+        setTimeout(() => ov.remove(), 1500);
+      } else {
+        msg.style.color = '#dc2626';
+        msg.textContent = 'Error en guardar. Comprova la configuració.';
+        document.getElementById('canvi-btn').textContent = 'Guardar';
+        document.getElementById('canvi-btn').disabled = false;
+      }
+    });
+  }
+
+  // ── Inici ──
+  (async () => {
+    if (sessionStorage.getItem('auth') === 'ok') {
+      mostrar();
+      return;
+    }
+    const carregant = mostrarCarregant();
+    const contrasenya = await obtenirContrasenya();
+    carregant.remove();
+    if (!contrasenya) {
+      alert('Error en connectar amb JSONbin. Comprova el BIN_ID i la API_KEY al fitxer HTML.');
+      return;
+    }
+    mostrarPantalla(contrasenya);
+  })();
+</script>
+</body>
+</html>
