@@ -381,11 +381,11 @@
   // ════════════════════════════════════════════
   // CONFIGURACIÓ — omple aquests dos valors
   // ════════════════════════════════════════════
-  const BIN_ID  = "POSA_AQUI_EL_TEU_BIN_ID";
-  const API_KEY = "POSA_AQUI_LA_TEVA_SECRET_KEY";
+  const BIN_ID  = "69fba055adc21f119a62c96d";
+  const API_KEY = "$2a$10$//OpihM1HJp0L7kyc0MGu.dXpcEdJzk78HxYT0eytCzbbWIzxCnC.";
   // ════════════════════════════════════════════
   // CONTRASENYA D'ADMINISTRADOR — només la saps tu
-  const ADMIN_PWD = "POSA_AQUI_LA_TEVA_CONTRASENYA_ADMIN";
+  const ADMIN_PWD = "impTorrentEsfera";
   // ════════════════════════════════════════════
 
   const contingut = document.querySelector('main');
