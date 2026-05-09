@@ -1,318 +1,573 @@
-javascript:(function(){/* © 2026 Ignasi Martí Palet */
-Element.prototype.ap=Element.prototype.appendChild;
-var _c=(...a)=>document.createElement(...a);
-var _q=(...a)=>document.querySelector(...a);
-var _qa=(...a)=>document.querySelectorAll(...a);
-var _id=(...a)=>document.getElementById(...a);
-var _rm=(...a)=>document.body.removeChild(...a);
-var _ba=(...a)=>document.body.appendChild(...a);
-var _st=(...a)=>setTimeout(...a);
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistent Esfer@ · Bookmarklet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-var isA=!!_q("select[data-ng-model='contingut.qualitativa']");
-var isM=!!_q('#my-tab-content');
-var isBATX=!!_q('table[data-st-table="dummyStudents"]');
+    :root {
+      --ink: #0f0f1a;
+      --ink-soft: #4a4a5a;
+      --ink-muted: #9898a8;
+      --paper: #f7f6f2;
+      --white: #ffffff;
+      --accent: #2d5be3;
+      --accent-light: #e8eefb;
+      --gold: #e8b84b;
+      --green: #2a7d4f;
+      --border: #e2e1dc;
+    }
 
-// ── TUTORIA (isA) ─────────────────────────────────────────────────────────────
-if(isA){
-  let fontLink=_c('link');fontLink.rel='stylesheet';
-  fontLink.href='https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap';
-  document.head.ap(fontLink);
-  let styleEl=_c('style');
-  styleEl.textContent='@keyframes tutorFadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes tutorPulse{0%,100%{opacity:1}50%{opacity:0.3}}';
-  document.head.ap(styleEl);
-  const F="font-family:'Outfit',system-ui,sans-serif;box-sizing:border-box;";
+    html { scroll-behavior: smooth; }
 
-  function cO(html,tancarFn){let ov=_c('div');ov.style.cssText='position:fixed;inset:0;background:rgba(10,10,20,0.5);backdrop-filter:blur(6px);z-index:999999;display:flex;align-items:center;justify-content:center';let box=_c('div');box.style.cssText=F+'background:#fff;border-radius:20px;padding:36px;min-width:360px;max-width:min(92vw,520px);box-shadow:0 32px 80px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.06);animation:tutorFadeIn 0.22s ease';box.innerHTML=html;ov.ap(box);_ba(ov);if(tancarFn)ov.addEventListener('click',e=>{if(e.target===ov)tancarFn(ov);});return ov;}
-  function cP(text){let d=_c('div');d.style.cssText=F+'position:fixed;top:20px;right:20px;padding:12px 20px;background:#0f0f1a;color:#fff;font-size:13px;font-weight:500;border-radius:100px;z-index:999998;box-shadow:0 8px 28px rgba(0,0,0,0.22);display:flex;align-items:center;gap:10px';d.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:#4ade80;display:inline-block;animation:tutorPulse 1.2s infinite"></span><span id="tutorProgressText">'+text+'</span>';_ba(d);return d;}
-  function sP(prog,t){let el=prog.querySelector('#tutorProgressText');if(el)el.textContent=t;}
-  function cT(id,btn){let taula=_id(id);if(!taula)return;let files=taula.querySelectorAll('tr');let text='';files.forEach(tr=>{let cel=tr.querySelectorAll('th,td');let fila=Array.from(cel).map(c=>c.textContent.trim()).join('\t');text+=fila+'\n';});navigator.clipboard.writeText(text).then(()=>{btn.textContent='✓ Copiat!';btn.style.background='#16a34a';_st(()=>{btn.textContent='📋 Copiar taula';btn.style.background='#0f0f1a';},2000);});}
-  function mR(total,mm,sm,al){let html='<div style="'+F+'"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px"><div><h2 style="'+F+'margin:0 0 4px;font-size:20px;font-weight:700;color:#0f0f1a">Resum de l\'acta</h2><p style="'+F+'margin:0;font-size:13px;color:#9ca3af">'+total+' alumnes processats</p></div><button id="btnTancarRes" style="'+F+'width:34px;height:34px;border-radius:50%;border:none;background:#f3f4f6;color:#6b7280;font-size:20px;cursor:pointer;line-height:1">×</button></div>';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><p style="'+F+'font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;margin:0">Per matèria</p><button id="btnCopy1" style="'+F+'padding:6px 12px;font-size:12px;font-weight:600;border:none;border-radius:8px;background:#0f0f1a;color:#fff;cursor:pointer">📋 Copiar taula</button></div>';
-  html+='<div style="border-radius:12px;overflow:hidden;border:1px solid #f0f0f0;margin-bottom:20px"><table id="tutorTaula1" style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb"><th style="'+F+'padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:#6b7280">MATÈRIA</th><th style="'+F+'padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#6b7280">SUSPESOS</th><th style="'+F+'padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#6b7280">%</th></tr></thead><tbody>';
-  for(let m in mm){let pct=(mm[m]/total*100).toFixed(1);let col=mm[m]===0?'#16a34a':mm[m]/total>0.3?'#dc2626':'#d97706';html+='<tr style="border-top:1px solid #f3f4f6"><td style="'+F+'padding:10px 14px;font-size:13px;color:#111">'+m+'</td><td style="'+F+'padding:10px 14px;text-align:center;font-size:14px;font-weight:700;color:'+col+'">'+mm[m]+'</td><td style="'+F+'padding:10px 14px;text-align:center;font-size:13px;color:#9ca3af">'+pct+'%</td></tr>';}
-  html+='</tbody></table></div>';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><p style="'+F+'font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;margin:0">Per nombre de suspesos</p><button id="btnCopy2" style="'+F+'padding:6px 12px;font-size:12px;font-weight:600;border:none;border-radius:8px;background:#0f0f1a;color:#fff;cursor:pointer">📋 Copiar taula</button></div>';
-  html+='<div style="border-radius:12px;overflow:hidden;border:1px solid #f0f0f0;margin-bottom:20px"><table id="tutorTaula2" style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb"><th style="'+F+'padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#6b7280">MAT. SUSPESES</th><th style="'+F+'padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#6b7280">Nº ALUMNES</th><th style="'+F+'padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#6b7280">%</th></tr></thead><tbody>';
-  for(let i=0;i<=10;i++){let n=Object.values(sm).filter(x=>x===i).length;let pct=total>0?((n/total)*100).toFixed(1):'0.0';let colorN=n===0?'#9ca3af':'#0f0f1a';html+='<tr style="border-top:1px solid #f3f4f6"><td style="'+F+'padding:10px 14px;text-align:center;font-size:13px;color:#111">'+i+'</td><td style="'+F+'padding:10px 14px;text-align:center;font-size:14px;font-weight:700;color:'+colorN+'">'+n+'</td><td style="'+F+'padding:10px 14px;text-align:center;font-size:13px;color:#9ca3af">'+pct+'%</td></tr>';}
-  html+='<tr style="background:#f9fafb;border-top:1px solid #e5e7eb"><td style="'+F+'padding:10px 14px;text-align:center;font-size:13px;font-weight:700;color:#0f0f1a">Total</td><td style="'+F+'padding:10px 14px;text-align:center;font-size:14px;font-weight:700;color:#0f0f1a">'+total+'</td><td style="'+F+'padding:10px 14px;text-align:center;font-size:13px;color:#9ca3af">100%</td></tr></tbody></table></div>';
-  if(al&&al.length){html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><p style="'+F+'font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;margin:0">Per alumne</p><button id="btnCopy3" style="'+F+'padding:6px 12px;font-size:12px;font-weight:600;border:none;border-radius:8px;background:#0f0f1a;color:#fff;cursor:pointer">📋 Copiar taula</button></div>';
-  html+='<div style="border-radius:12px;overflow:hidden;border:1px solid #f0f0f0;margin-bottom:20px"><table id="tutorTaula3" style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb"><th style="'+F+'padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#6b7280">ALUMNE</th><th style="'+F+'padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#6b7280">Nº SUSP.</th><th style="'+F+'padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:#6b7280">MATÈRIES SUSPESES</th></tr></thead><tbody>';
-  al.forEach(a=>{let col=a.count===0?'#16a34a':a.count>3?'#dc2626':'#d97706';html+='<tr style="border-top:1px solid #f3f4f6"><td style="'+F+'padding:10px 14px;text-align:center;font-size:13px;color:#111">'+a.num+'</td><td style="'+F+'padding:10px 14px;text-align:center;font-size:14px;font-weight:700;color:'+col+'">'+a.count+'</td><td style="'+F+'padding:10px 14px;font-size:12px;color:#374151;line-height:1.7">'+a.mats.join('<br>')+'</td></tr>';});
-  html+='</tbody></table></div>';}
-  html+='</div>';
-  let ov=cO('<div style="max-height:80vh;overflow-y:auto;padding-right:4px">'+html+'</div>',o=>_rm(o));
-  _st(()=>{let b=_id('btnTancarRes');if(b)b.onclick=()=>{if(ov.parentNode)_rm(ov);};let c1=_id('btnCopy1');if(c1)c1.onclick=()=>cT('tutorTaula1',c1);let c2=_id('btnCopy2');if(c2)c2.onclick=()=>cT('tutorTaula2',c2);let c3=_id('btnCopy3');if(c3)c3.onclick=()=>cT('tutorTaula3',c3);},100);}
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-  function dC(callback){let html='<div style="'+F+'text-align:center"><div style="width:52px;height:52px;background:#0f0f1a;border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:16px">💬</div><h2 style="'+F+'margin:0 0 6px;font-size:21px;font-weight:700;color:#0f0f1a">Comentaris</h2><p style="'+F+'margin:0 0 20px;font-size:13px;color:#9ca3af">Enganxa els comentaris (un per alumne)</p><textarea id="tutorTA" placeholder="Comentari alumne 1&#10;Comentari alumne 2&#10;Comentari alumne 3&#10;..." style="'+F+'width:100%;height:160px;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px;font-size:13px;color:#0f0f1a;resize:vertical;outline:none;line-height:1.6"></textarea><div style="display:flex;gap:10px;margin-top:16px"><button id="btnCancelCom" style="'+F+'flex:1;padding:13px;font-size:14px;font-weight:600;border:1.5px solid #e5e7eb;border-radius:12px;background:transparent;color:#9ca3af;cursor:pointer">Cancel·lar</button><button id="btnOkCom" style="'+F+'flex:2;padding:13px;font-size:14px;font-weight:600;border:none;border-radius:12px;background:#0f0f1a;color:#fff;cursor:pointer">Continuar →</button></div></div>';
-  let ov=cO(html,null);_st(()=>{let ta=_id('tutorTA');if(ta)ta.focus();let ok=_id('btnOkCom');if(ok)ok.onclick=()=>{let val=ta?ta.value:'';if(ov.parentNode)_rm(ov);callback(val);};let ca=_id('btnCancelCom');if(ca)ca.onclick=()=>{if(ov.parentNode)_rm(ov);};},100);}
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  // Badge de tutoria eliminat perquè "Eina de Tutoria" ja ho indica
-  let mH='<div style="'+F+'text-align:center"><div style="width:52px;height:52px;background:#0f0f1a;border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:16px">🎓</div><h2 style="'+F+'margin:0 0 6px;font-size:21px;font-weight:700;color:#0f0f1a">Eina de Tutoria</h2><p style="'+F+'margin:0 0 28px;font-size:13px;color:#9ca3af">Selecciona l\'acció que vols executar</p><div style="display:flex;flex-direction:column;gap:10px"><button id="btn1" style="'+F+'padding:14px 20px;font-size:14px;font-weight:600;border:none;border-radius:12px;background:#0f0f1a;color:#fff;cursor:pointer;display:flex;align-items:center;gap:12px">💬<span>Comentaris de tutor</span></button><button id="btn2" style="'+F+'padding:14px 20px;font-size:14px;font-weight:600;border:none;border-radius:12px;background:#0f0f1a;color:#fff;cursor:pointer;display:flex;align-items:center;gap:12px">📋<span>Acta de tutoria</span></button><button id="btn3" style="'+F+'padding:14px 20px;font-size:14px;font-weight:600;border:2px solid #0f0f1a;border-radius:12px;background:#fff;color:#0f0f1a;cursor:pointer;display:flex;align-items:center;gap:12px">⚡<span>Les dues a la vegada</span></button><button id="btnX" style="'+F+'padding:10px 20px;font-size:13px;font-weight:500;border:1.5px solid #e5e7eb;border-radius:12px;background:transparent;color:#9ca3af;cursor:pointer;margin-top:2px">Cancel·lar</button><p style="font-size:11px;color:#9ca3af;text-align:center;margin-top:14px;margin-bottom:0">© 2026 Ignasi Martí Palet</p><div></div>';
-  let mO=cO(mH,o=>_rm(o));
-  function tM(){if(mO.parentNode)_rm(mO);}
-  function o1(){tM();dC(function(text){if(!text.trim())return;let cm=text.split("\n");let i=0;let prog=cP("Comentaris: 0 / "+cm.length);function run(){if(i>=cm.length){sP(prog,"Tots els comentaris processats! ✓");return;}sP(prog,"Comentaris: "+(i+1)+" / "+cm.length);let oB=_q("a[data-ng-click='showCommentsModal()']");if(!oB){_st(run,500);return;}oB.click();let wM=setInterval(function(){let ta=_q("textarea[data-ng-model='comentariGeneral.comentari']");let sC=_q("a[data-ng-click='saveComentariGeneral()']");if(ta&&sC){clearInterval(wM);let c=(cm[i]||"").trim();if(c!==""){ta.value=c;ta.dispatchEvent(new InputEvent("input",{bubbles:true}));sC.click();}_st(function(){let sG=_q("a[data-ng-click='saveNotesAvaluacio()']");if(sG)sG.click();let wS=setInterval(function(){let alerts=_qa(".alert-success");let found=false;alerts.forEach(function(a){if(a.innerText.toLowerCase().includes("desat"))found=true;});if(found){clearInterval(wS);let next=_q("a[data-ng-click=\"canviAlumne('next')\"]");if(!next||next.disabled){sP(prog,"Tots els comentaris processats! ✓");return;}angular.element(next).triggerHandler('click');i++;_st(run,7000);}},500);},2000);}},200);}run();});}
-  function o2(){tM();let total=0,mm={},sm={},aP=new Set(),mC={},al=[];let prog=cP("Alumnes: 0");function gS(){return Array.from(_qa("select[data-ng-model='contingut.qualitativa']")).filter(s=>s.offsetParent!==null);}function pr(){let selects=gS();let bt=_q("a.btn.btn-warning[data-ng-click='showCommentsModal()']");if(!bt)return;let alumID=bt.closest("tr")?bt.closest("tr").textContent.trim():total;if(aP.has(alumID))return;aP.add(alumID);let susp=0,matsSusp=[];selects.forEach(sel=>{let tr=sel.closest("tr");let td=tr?tr.querySelector("td[data-ng-if*='matPNomVis']"):null;if(td){let mat=td.textContent.trim();let matID=alumID+"||"+mat;if(!mC[matID]){mC[matID]=true;let nota=sel.value.replace("string:","");if(nota==="NA"){mm[mat]=(mm[mat]||0)+1;susp++;matsSusp.push(mat);}else{mm[mat]=mm[mat]||0;}}}});sm[alumID]=susp;al.push({num:total+1,count:susp,mats:matsSusp});total++;sP(prog,"Alumnes: "+total);}function sg(){let next=_q("a[data-ng-click=\"canviAlumne('next')\"]");if(next&&!next.hasAttribute("disabled")){angular.element(next).triggerHandler('click');return true;}return false;}function eE(cb){let lC=0,sT=0;let int=setInterval(()=>{let count=gS().length;let bt=_q("a.btn.btn-warning[data-ng-click='showCommentsModal()']");if(bt&&count===lC&&count>0){sT+=100;if(sT>=500){clearInterval(int);cb();}}else{sT=0;lC=count;}},100);}function acabar(){sP(prog,"Processament complet! ✓");mR(total,mm,sm,al);}function loop(){eE(()=>{pr();if(sg()){_st(loop,150);}else{acabar();}});}loop();}
-  function o3(){tM();dC(function(text){if(!text.trim())return;let cm=text.split("\n");let i=0;let total=0,mm={},sm={},aP=new Set(),mC={},al=[];let prog=cP("Processant: 0 / "+cm.length);function gS(){return Array.from(_qa("select[data-ng-model='contingut.qualitativa']")).filter(s=>s.offsetParent!==null);}function pD(){let selects=gS();let bt=_q("a.btn.btn-warning[data-ng-click='showCommentsModal()']");if(!bt)return;let alumID=bt.closest("tr")?bt.closest("tr").textContent.trim():total;if(aP.has(alumID))return;aP.add(alumID);let susp=0,matsSusp=[];selects.forEach(sel=>{let tr=sel.closest("tr");let td=tr?tr.querySelector("td[data-ng-if*='matPNomVis']"):null;if(td){let mat=td.textContent.trim();let matID=alumID+"||"+mat;if(!mC[matID]){mC[matID]=true;let nota=sel.value.replace("string:","");if(nota==="NA"){mm[mat]=(mm[mat]||0)+1;susp++;matsSusp.push(mat);}else{mm[mat]=mm[mat]||0;}}}});sm[alumID]=susp;al.push({num:total+1,count:susp,mats:matsSusp});total++;}function eE(cb){let lC=0,sT=0;let int=setInterval(()=>{let count=gS().length;let bt=_q("a.btn.btn-warning[data-ng-click='showCommentsModal()']");if(bt&&count===lC&&count>0){sT+=100;if(sT>=500){clearInterval(int);cb();}}else{sT=0;lC=count;}},100);}function aA(){sP(prog,"Tot processat! ✓");mR(total,mm,sm,al);}function dP(last){_st(function(){let sG=_q("a[data-ng-click='saveNotesAvaluacio()']");if(sG)sG.click();let wS=setInterval(function(){let alerts=_qa(".alert-success");let found=false;alerts.forEach(function(a){if(a.innerText.toLowerCase().includes("desat"))found=true;});if(found){clearInterval(wS);if(last){aA();return;}let next=_q("a[data-ng-click=\"canviAlumne('next')\"]");if(!next||next.hasAttribute("disabled")){aA();return;}angular.element(next).triggerHandler('click');i++;_st(rC,7000);}},500);},2000);}function eC(last){let c=(cm[i]||"").trim();if(c===""){dP(last);return;}let oB=_q("a[data-ng-click='showCommentsModal()']");if(!oB){_st(()=>eC(last),500);return;}oB.click();let wM=setInterval(function(){let ta=_q("textarea[data-ng-model='comentariGeneral.comentari']");let sC=_q("a[data-ng-click='saveComentariGeneral()']");if(ta&&sC){clearInterval(wM);ta.value=c;ta.dispatchEvent(new InputEvent("input",{bubbles:true}));sC.click();dP(last);}},200);}function rC(){sP(prog,"Processant: "+(i+1)+" / "+cm.length);eE(()=>{pD();let next=_q("a[data-ng-click=\"canviAlumne('next')\"]");let isLast=!next||next.hasAttribute("disabled");eC(isLast);});}rC();});}
-  _id("btn1").onclick=o1;_id("btn2").onclick=o2;_id("btn3").onclick=o3;_id("btnX").onclick=tM;
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 48px 48px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-// ── AVALUACIONS FINALS BATXILLERAT (isBATX) — comprovat ABANS que isM ─────────
-}else if(isBATX){
-  if(_id('esfera-overlay-batx'))return;
-  const CTX='Avaluació final Batxillerat';
-  const ov=_c('div');ov.id='esfera-overlay-batx';ov.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:99999;display:flex;align-items:center;justify-content:center;';
-  const md=_c('div');md.style.cssText='background:#fff;border-radius:12px;padding:24px;width:420px;max-width:90vw;max-height:85vh;overflow-y:auto;font-family:sans-serif;color:#111;box-sizing:border-box;';
-  function close(){ov.remove();}
-  ov.addEventListener('click',e=>{if(e.target===ov)close();});
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
 
-  function gR(){
-    return Array.from(_qa('table[data-st-table="dummyStudents"] tbody tr')).filter(r=>{
-      const inp=r.querySelector('input[name="qualitativa"]');
-      const gris=r.querySelector('.cursiva');
-      return inp&&!inp.disabled&&!gris;
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: #e6f4ed;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 80px auto 0;
+      padding: 0 32px;
+      text-align: center;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(38px, 7vw, 64px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--ink-soft);
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    /* ── DRAG ZONE ── */
+    .drag-zone {
+      background: var(--white);
+      border: 2px dashed var(--border);
+      border-radius: 24px;
+      padding: 48px 32px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .drag-zone:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .drag-zone p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .bookmarklet-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      background: var(--ink);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: 14px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      cursor: grab;
+      box-shadow: 0 8px 32px rgba(15,15,26,0.18), 0 2px 8px rgba(15,15,26,0.08);
+      transition: transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+
+    .bookmarklet-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 16px 48px rgba(15,15,26,0.22), 0 4px 12px rgba(15,15,26,0.1);
+    }
+
+    .bookmarklet-btn:active {
+      cursor: grabbing;
+      transform: translateY(0) scale(0.98);
+    }
+
+    .bookmarklet-btn .icon {
+      font-size: 20px;
+    }
+
+    /* ── STEPS ── */
+    .steps {
+      max-width: 760px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+    }
+
+    .steps-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .step {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+    }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent-light);
+      -webkit-text-stroke: 2px var(--accent);
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .step p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .step kbd {
+      font-size: 11px;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--ink-soft);
+    }
+
+    /* ── COMPAT ── */
+    .compat {
+      max-width: 760px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+    }
+
+    .compat-inner {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .compat-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .compat-inner h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .compat-inner p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer p {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    /* ── DECORATIVE BG BLOB ── */
+    .blob {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle at center, rgba(45,91,227,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -200px;
+      right: -200px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      header { padding: 28px 20px 0; }
+      .hero, .steps, .compat { padding: 0 20px; }
+      .hero { margin-top: 48px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      footer { padding: 24px 20px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob"></div>
+
+<header>
+  <span class="logo">Assistent Esfer@</span>
+  <span class="badge">v2026</span>
+</header>
+
+<main>
+  <section class="hero">
+    <span class="hero-tag">Bookmarklet per a l'Esfera</span>
+    <h1>Assistent<br><em>Esfer@</em></h1>
+    <p>Afegeix aquest marcador al teu navegador i gestiona comentaris i actes de tutoria amb un sol clic des de l'Esfera o el Moodle.</p>
+
+    <div class="drag-zone">
+      <p>↓ Arrossega aquest botó fins a la barra de marcadors ↓</p>
+      <a class="bookmarklet-btn"
+        href='javascript:%28function%28%29%7B%2F%2A%20%C2%A9%202026%20Ignasi%20Mart%C3%AD%20Palet%20%2A%2FElement.prototype.ap%3DElement.prototype.appendChild%3Bvar%20_c%3D%28...a%29%3D%3Edocument.createElement%28...a%29%3Bvar%20_q%3D%28...a%29%3D%3Edocument.querySelector%28...a%29%3Bvar%20_qa%3D%28...a%29%3D%3Edocument.querySelectorAll%28...a%29%3Bvar%20_id%3D%28...a%29%3D%3Edocument.getElementById%28...a%29%3Bvar%20_rm%3D%28...a%29%3D%3Edocument.body.removeChild%28...a%29%3Bvar%20_ba%3D%28...a%29%3D%3Edocument.body.appendChild%28...a%29%3Bvar%20_st%3D%28...a%29%3D%3EsetTimeout%28...a%29%3Bvar%20isA%3D%21%21_q%28%22select%5Bdata-ng-model%3D%27contingut.qualitativa%27%5D%22%29%3Bvar%20isM%3D%21%21_q%28%27%23my-tab-content%27%29%3Bif%28isA%29%7Blet%20fontLink%3D_c%28%27link%27%29%3BfontLink.rel%3D%27stylesheet%27%3BfontLink.href%3D%27https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DOutfit%3Awght%40400%3B500%3B600%3B700%26display%3Dswap%27%3Bdocument.head.ap%28fontLink%29%3Blet%20styleEl%3D_c%28%27style%27%29%3BstyleEl.textContent%3D%27%40keyframes%20tutorFadeIn%7Bfrom%7Bopacity%3A0%3Btransform%3AtranslateY%2814px%29%7Dto%7Bopacity%3A1%3Btransform%3AtranslateY%280%29%7D%7D%40keyframes%20tutorPulse%7B0%25%2C100%25%7Bopacity%3A1%7D50%25%7Bopacity%3A0.3%7D%7D%27%3Bdocument.head.ap%28styleEl%29%3Bconst%20F%3D%22font-family%3A%27Outfit%27%2Csystem-ui%2Csans-serif%3Bbox-sizing%3Aborder-box%3B%22%3Bfunction%20cO%28html%2CtancarFn%29%7Blet%20ov%3D_c%28%27div%27%29%3Bov.style.cssText%3D%27position%3Afixed%3Binset%3A0%3Bbackground%3Argba%2810%2C10%2C20%2C0.5%29%3Bbackdrop-filter%3Ablur%286px%29%3Bz-index%3A999999%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Acenter%27%3Blet%20box%3D_c%28%27div%27%29%3Bbox.style.cssText%3DF%2B%27background%3A%23fff%3Bborder-radius%3A20px%3Bpadding%3A36px%3Bmin-width%3A360px%3Bmax-width%3Amin%2892vw%2C520px%29%3Bbox-shadow%3A0%2032px%2080px%20rgba%280%2C0%2C0%2C0.18%29%2C0%202px%208px%20rgba%280%2C0%2C0%2C0.06%29%3Banimation%3AtutorFadeIn%200.22s%20ease%27%3Bbox.innerHTML%3Dhtml%3Bov.ap%28box%29%3B_ba%28ov%29%3Bif%28tancarFn%29ov.addEventListener%28%27click%27%2Ce%3D%3E%7Bif%28e.target%3D%3D%3Dov%29tancarFn%28ov%29%3B%7D%29%3Breturn%20ov%3B%7Dfunction%20cP%28text%29%7Blet%20d%3D_c%28%27div%27%29%3Bd.style.cssText%3DF%2B%27position%3Afixed%3Btop%3A20px%3Bright%3A20px%3Bpadding%3A12px%2020px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bfont-size%3A13px%3Bfont-weight%3A500%3Bborder-radius%3A100px%3Bz-index%3A999998%3Bbox-shadow%3A0%208px%2028px%20rgba%280%2C0%2C0%2C0.22%29%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A10px%27%3Bd.innerHTML%3D%27%3Cspan%20style%3D%22width%3A8px%3Bheight%3A8px%3Bborder-radius%3A50%25%3Bbackground%3A%234ade80%3Bdisplay%3Ainline-block%3Banimation%3AtutorPulse%201.2s%20infinite%22%3E%3C%2Fspan%3E%3Cspan%20id%3D%22tutorProgressText%22%3E%27%2Btext%2B%27%3C%2Fspan%3E%27%3B_ba%28d%29%3Breturn%20d%3B%7Dfunction%20sP%28prog%2Ct%29%7Blet%20el%3Dprog.querySelector%28%27%23tutorProgressText%27%29%3Bif%28el%29el.textContent%3Dt%3B%7Dfunction%20cT%28id%2Cbtn%29%7Blet%20taula%3D_id%28id%29%3Bif%28%21taula%29return%3Blet%20files%3Dtaula.querySelectorAll%28%27tr%27%29%3Blet%20text%3D%27%27%3Bfiles.forEach%28tr%3D%3E%7Blet%20cel%3Dtr.querySelectorAll%28%27th%2Ctd%27%29%3Blet%20fila%3DArray.from%28cel%29.map%28c%3D%3Ec.textContent.trim%28%29%29.join%28%27%5Ct%27%29%3Btext%2B%3Dfila%2B%27%5Cn%27%3B%7D%29%3Bnavigator.clipboard.writeText%28text%29.then%28%28%29%3D%3E%7Bbtn.textContent%3D%27%E2%9C%93%20Copiat%21%27%3Bbtn.style.background%3D%27%2316a34a%27%3B_st%28%28%29%3D%3E%7Bbtn.textContent%3D%27%F0%9F%93%8B%20Copiar%20taula%27%3Bbtn.style.background%3D%27%230f0f1a%27%3B%7D%2C2000%29%3B%7D%29%3B%7Dfunction%20mR%28total%2Cmm%2Csm%2Cal%29%7Blet%20html%3D%27%3Cdiv%20style%3D%22%27%2BF%2B%27%22%3E%3Cdiv%20style%3D%22display%3Aflex%3Balign-items%3Aflex-start%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A24px%22%3E%3Cdiv%3E%3Ch2%20style%3D%22%27%2BF%2B%27margin%3A0%200%204px%3Bfont-size%3A20px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3EResum%20de%20l%5C%27acta%3C%2Fh2%3E%3Cp%20style%3D%22%27%2BF%2B%27margin%3A0%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E%27%2Btotal%2B%27%20alumnes%20processats%3C%2Fp%3E%3C%2Fdiv%3E%3Cbutton%20id%3D%22btnTancarRes%22%20style%3D%22%27%2BF%2B%27width%3A34px%3Bheight%3A34px%3Bborder-radius%3A50%25%3Bborder%3Anone%3Bbackground%3A%23f3f4f6%3Bcolor%3A%236b7280%3Bfont-size%3A20px%3Bcursor%3Apointer%3Bline-height%3A1%22%3E%C3%97%3C%2Fbutton%3E%3C%2Fdiv%3E%27%3Bhtml%2B%3D%27%3Cdiv%20style%3D%22display%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A8px%22%3E%3Cp%20style%3D%22%27%2BF%2B%27font-size%3A11px%3Bfont-weight%3A700%3Bcolor%3A%239ca3af%3Btext-transform%3Auppercase%3Bletter-spacing%3A0.08em%3Bmargin%3A0%22%3EPer%20mat%C3%A8ria%3C%2Fp%3E%3Cbutton%20id%3D%22btnCopy1%22%20style%3D%22%27%2BF%2B%27padding%3A6px%2012px%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3E%F0%9F%93%8B%20Copiar%20taula%3C%2Fbutton%3E%3C%2Fdiv%3E%27%3Bhtml%2B%3D%27%3Cdiv%20style%3D%22border-radius%3A12px%3Boverflow%3Ahidden%3Bborder%3A1px%20solid%20%23f0f0f0%3Bmargin-bottom%3A20px%22%3E%3Ctable%20id%3D%22tutorTaula1%22%20style%3D%22width%3A100%25%3Bborder-collapse%3Acollapse%22%3E%3Cthead%3E%3Ctr%20style%3D%22background%3A%23f9fafb%22%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Aleft%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EMAT%C3%88RIA%3C%2Fth%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3ESUSPESOS%3C%2Fth%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3E%25%3C%2Fth%3E%3C%2Ftr%3E%3C%2Fthead%3E%3Ctbody%3E%27%3Bfor%28let%20m%20in%20mm%29%7Blet%20pct%3D%28mm%5Bm%5D%2Ftotal%2A100%29.toFixed%281%29%3Blet%20col%3Dmm%5Bm%5D%3D%3D%3D0%3F%27%2316a34a%27%3Amm%5Bm%5D%2Ftotal%3E0.3%3F%27%23dc2626%27%3A%27%23d97706%27%3Bhtml%2B%3D%27%3Ctr%20style%3D%22border-top%3A1px%20solid%20%23f3f4f6%22%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Bfont-size%3A13px%3Bcolor%3A%23111%22%3E%27%2Bm%2B%27%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A%27%2Bcol%2B%27%22%3E%27%2Bmm%5Bm%5D%2B%27%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E%27%2Bpct%2B%27%25%3C%2Ftd%3E%3C%2Ftr%3E%27%3B%7Dhtml%2B%3D%27%3C%2Ftbody%3E%3C%2Ftable%3E%3C%2Fdiv%3E%27%3Bhtml%2B%3D%27%3Cdiv%20style%3D%22display%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A8px%22%3E%3Cp%20style%3D%22%27%2BF%2B%27font-size%3A11px%3Bfont-weight%3A700%3Bcolor%3A%239ca3af%3Btext-transform%3Auppercase%3Bletter-spacing%3A0.08em%3Bmargin%3A0%22%3EPer%20nombre%20de%20suspesos%3C%2Fp%3E%3Cbutton%20id%3D%22btnCopy2%22%20style%3D%22%27%2BF%2B%27padding%3A6px%2012px%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3E%F0%9F%93%8B%20Copiar%20taula%3C%2Fbutton%3E%3C%2Fdiv%3E%27%3Bhtml%2B%3D%27%3Cdiv%20style%3D%22border-radius%3A12px%3Boverflow%3Ahidden%3Bborder%3A1px%20solid%20%23f0f0f0%3Bmargin-bottom%3A20px%22%3E%3Ctable%20id%3D%22tutorTaula2%22%20style%3D%22width%3A100%25%3Bborder-collapse%3Acollapse%22%3E%3Cthead%3E%3Ctr%20style%3D%22background%3A%23f9fafb%22%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EMAT.%20SUSPESES%3C%2Fth%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EN%C2%BA%20ALUMNES%3C%2Fth%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3E%25%3C%2Fth%3E%3C%2Ftr%3E%3C%2Fthead%3E%3Ctbody%3E%27%3Bfor%28let%20i%3D0%3Bi%3C%3D10%3Bi%2B%2B%29%7Blet%20n%3DObject.values%28sm%29.filter%28x%3D%3Ex%3D%3D%3Di%29.length%3Blet%20pct%3Dtotal%3E0%3F%28%28n%2Ftotal%29%2A100%29.toFixed%281%29%3A%270.0%27%3Blet%20colorN%3Dn%3D%3D%3D0%3F%27%239ca3af%27%3A%27%230f0f1a%27%3Bhtml%2B%3D%27%3Ctr%20style%3D%22border-top%3A1px%20solid%20%23f3f4f6%22%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%23111%22%3E%27%2Bi%2B%27%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A%27%2BcolorN%2B%27%22%3E%27%2Bn%2B%27%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E%27%2Bpct%2B%27%25%3C%2Ftd%3E%3C%2Ftr%3E%27%3B%7Dhtml%2B%3D%27%3Ctr%20style%3D%22background%3A%23f9fafb%3Bborder-top%3A1px%20solid%20%23e5e7eb%22%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3ETotal%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3E%27%2Btotal%2B%27%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3E100%25%3C%2Ftd%3E%3C%2Ftr%3E%3C%2Ftbody%3E%3C%2Ftable%3E%3C%2Fdiv%3E%27%3Bif%28al%26%26al.length%29%7Bhtml%2B%3D%27%3Cdiv%20style%3D%22display%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Aspace-between%3Bmargin-bottom%3A8px%22%3E%3Cp%20style%3D%22%27%2BF%2B%27font-size%3A11px%3Bfont-weight%3A700%3Bcolor%3A%239ca3af%3Btext-transform%3Auppercase%3Bletter-spacing%3A0.08em%3Bmargin%3A0%22%3EPer%20alumne%3C%2Fp%3E%3Cbutton%20id%3D%22btnCopy3%22%20style%3D%22%27%2BF%2B%27padding%3A6px%2012px%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3E%F0%9F%93%8B%20Copiar%20taula%3C%2Fbutton%3E%3C%2Fdiv%3E%27%3Bhtml%2B%3D%27%3Cdiv%20style%3D%22border-radius%3A12px%3Boverflow%3Ahidden%3Bborder%3A1px%20solid%20%23f0f0f0%3Bmargin-bottom%3A20px%22%3E%3Ctable%20id%3D%22tutorTaula3%22%20style%3D%22width%3A100%25%3Bborder-collapse%3Acollapse%22%3E%3Cthead%3E%3Ctr%20style%3D%22background%3A%23f9fafb%22%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EALUMNE%3C%2Fth%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EN%C2%BA%20SUSP.%3C%2Fth%3E%3Cth%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Aleft%3Bfont-size%3A12px%3Bfont-weight%3A600%3Bcolor%3A%236b7280%22%3EMAT%C3%88RIES%20SUSPESES%3C%2Fth%3E%3C%2Ftr%3E%3C%2Fthead%3E%3Ctbody%3E%27%3Bal.forEach%28a%3D%3E%7Blet%20col%3Da.count%3D%3D%3D0%3F%27%2316a34a%27%3Aa.count%3E3%3F%27%23dc2626%27%3A%27%23d97706%27%3Bhtml%2B%3D%27%3Ctr%20style%3D%22border-top%3A1px%20solid%20%23f3f4f6%22%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A13px%3Bcolor%3A%23111%22%3E%27%2Ba.num%2B%27%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Btext-align%3Acenter%3Bfont-size%3A14px%3Bfont-weight%3A700%3Bcolor%3A%27%2Bcol%2B%27%22%3E%27%2Ba.count%2B%27%3C%2Ftd%3E%3Ctd%20style%3D%22%27%2BF%2B%27padding%3A10px%2014px%3Bfont-size%3A12px%3Bcolor%3A%23374151%3Bline-height%3A1.7%22%3E%27%2Ba.mats.join%28%27%3Cbr%3E%27%29%2B%27%3C%2Ftd%3E%3C%2Ftr%3E%27%3B%7D%29%3Bhtml%2B%3D%27%3C%2Ftbody%3E%3C%2Ftable%3E%3C%2Fdiv%3E%27%3B%7Dhtml%2B%3D%27%3C%2Fdiv%3E%27%3Blet%20ov%3DcO%28%27%3Cdiv%20style%3D%22max-height%3A80vh%3Boverflow-y%3Aauto%3Bpadding-right%3A4px%22%3E%27%2Bhtml%2B%27%3C%2Fdiv%3E%27%2Co%3D%3E_rm%28o%29%29%3B_st%28%28%29%3D%3E%7Blet%20b%3D_id%28%27btnTancarRes%27%29%3Bif%28b%29b.onclick%3D%28%29%3D%3E%7Bif%28ov.parentNode%29_rm%28ov%29%3B%7D%3Blet%20c1%3D_id%28%27btnCopy1%27%29%3Bif%28c1%29c1.onclick%3D%28%29%3D%3EcT%28%27tutorTaula1%27%2Cc1%29%3Blet%20c2%3D_id%28%27btnCopy2%27%29%3Bif%28c2%29c2.onclick%3D%28%29%3D%3EcT%28%27tutorTaula2%27%2Cc2%29%3Blet%20c3%3D_id%28%27btnCopy3%27%29%3Bif%28c3%29c3.onclick%3D%28%29%3D%3EcT%28%27tutorTaula3%27%2Cc3%29%3B%7D%2C100%29%3B%7Dfunction%20dC%28callback%29%7Blet%20html%3D%27%3Cdiv%20style%3D%22%27%2BF%2B%27text-align%3Acenter%22%3E%3Cdiv%20style%3D%22width%3A52px%3Bheight%3A52px%3Bbackground%3A%230f0f1a%3Bborder-radius%3A16px%3Bdisplay%3Ainline-flex%3Balign-items%3Acenter%3Bjustify-content%3Acenter%3Bfont-size%3A26px%3Bmargin-bottom%3A16px%22%3E%F0%9F%92%AC%3C%2Fdiv%3E%3Ch2%20style%3D%22%27%2BF%2B%27margin%3A0%200%206px%3Bfont-size%3A21px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3EComentaris%3C%2Fh2%3E%3Cp%20style%3D%22%27%2BF%2B%27margin%3A0%200%2020px%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3EEnganxa%20els%20comentaris%20%28un%20per%20alumne%29%3C%2Fp%3E%3Ctextarea%20id%3D%22tutorTA%22%20placeholder%3D%22Comentari%20alumne%201%26%2310%3BComentari%20alumne%202%26%2310%3BComentari%20alumne%203%26%2310%3B...%22%20style%3D%22%27%2BF%2B%27width%3A100%25%3Bheight%3A160px%3Bborder%3A1.5px%20solid%20%23e5e7eb%3Bborder-radius%3A12px%3Bpadding%3A14px%3Bfont-size%3A13px%3Bcolor%3A%230f0f1a%3Bresize%3Avertical%3Boutline%3Anone%3Bline-height%3A1.6%22%3E%3C%2Ftextarea%3E%3Cdiv%20style%3D%22display%3Aflex%3Bgap%3A10px%3Bmargin-top%3A16px%22%3E%3Cbutton%20id%3D%22btnCancelCom%22%20style%3D%22%27%2BF%2B%27flex%3A1%3Bpadding%3A13px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3A1.5px%20solid%20%23e5e7eb%3Bborder-radius%3A12px%3Bbackground%3Atransparent%3Bcolor%3A%239ca3af%3Bcursor%3Apointer%22%3ECancel%C2%B7lar%3C%2Fbutton%3E%3Cbutton%20id%3D%22btnOkCom%22%20style%3D%22%27%2BF%2B%27flex%3A2%3Bpadding%3A13px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A12px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%22%3EContinuar%20%E2%86%92%3C%2Fbutton%3E%3C%2Fdiv%3E%3C%2Fdiv%3E%27%3Blet%20ov%3DcO%28html%2Cnull%29%3B_st%28%28%29%3D%3E%7Blet%20ta%3D_id%28%27tutorTA%27%29%3Bif%28ta%29ta.focus%28%29%3Blet%20ok%3D_id%28%27btnOkCom%27%29%3Bif%28ok%29ok.onclick%3D%28%29%3D%3E%7Blet%20val%3Dta%3Fta.value%3A%27%27%3Bif%28ov.parentNode%29_rm%28ov%29%3Bcallback%28val%29%3B%7D%3Blet%20ca%3D_id%28%27btnCancelCom%27%29%3Bif%28ca%29ca.onclick%3D%28%29%3D%3E%7Bif%28ov.parentNode%29_rm%28ov%29%3B%7D%3B%7D%2C100%29%3B%7Dlet%20mH%3D%27%3Cdiv%20style%3D%22%27%2BF%2B%27text-align%3Acenter%22%3E%3Cdiv%20style%3D%22width%3A52px%3Bheight%3A52px%3Bbackground%3A%230f0f1a%3Bborder-radius%3A16px%3Bdisplay%3Ainline-flex%3Balign-items%3Acenter%3Bjustify-content%3Acenter%3Bfont-size%3A26px%3Bmargin-bottom%3A16px%22%3E%F0%9F%8E%93%3C%2Fdiv%3E%3Ch2%20style%3D%22%27%2BF%2B%27margin%3A0%200%206px%3Bfont-size%3A21px%3Bfont-weight%3A700%3Bcolor%3A%230f0f1a%22%3EEina%20de%20Tutoria%3C%2Fh2%3E%3Cp%20style%3D%22%27%2BF%2B%27margin%3A0%200%2028px%3Bfont-size%3A13px%3Bcolor%3A%239ca3af%22%3ESelecciona%20l%5C%27acci%C3%B3%20que%20vols%20executar%3C%2Fp%3E%3Cdiv%20style%3D%22display%3Aflex%3Bflex-direction%3Acolumn%3Bgap%3A10px%22%3E%3Cbutton%20id%3D%22btn1%22%20style%3D%22%27%2BF%2B%27padding%3A14px%2020px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A12px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A12px%22%3E%F0%9F%92%AC%3Cspan%3EComentaris%20de%20tutor%3C%2Fspan%3E%3C%2Fbutton%3E%3Cbutton%20id%3D%22btn2%22%20style%3D%22%27%2BF%2B%27padding%3A14px%2020px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3Anone%3Bborder-radius%3A12px%3Bbackground%3A%230f0f1a%3Bcolor%3A%23fff%3Bcursor%3Apointer%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A12px%22%3E%F0%9F%93%8B%3Cspan%3EActa%20de%20tutoria%3C%2Fspan%3E%3C%2Fbutton%3E%3Cbutton%20id%3D%22btn3%22%20style%3D%22%27%2BF%2B%27padding%3A14px%2020px%3Bfont-size%3A14px%3Bfont-weight%3A600%3Bborder%3A2px%20solid%20%230f0f1a%3Bborder-radius%3A12px%3Bbackground%3A%23fff%3Bcolor%3A%230f0f1a%3Bcursor%3Apointer%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bgap%3A12px%22%3E%E2%9A%A1%3Cspan%3ELes%20dues%20a%20la%20vegada%3C%2Fspan%3E%3C%2Fbutton%3E%3Cbutton%20id%3D%22btnX%22%20style%3D%22%27%2BF%2B%27padding%3A10px%2020px%3Bfont-size%3A13px%3Bfont-weight%3A500%3Bborder%3A1.5px%20solid%20%23e5e7eb%3Bborder-radius%3A12px%3Bbackground%3Atransparent%3Bcolor%3A%239ca3af%3Bcursor%3Apointer%3Bmargin-top%3A2px%22%3ECancel%C2%B7lar%3C%2Fbutton%3E%3Cp%20style%3D%22font-size%3A11px%3Bcolor%3A%239ca3af%3Btext-align%3Acenter%3Bmargin-top%3A14px%3Bmargin-bottom%3A0%22%3E%C2%A9%202026%20Ignasi%20Mart%C3%AD%20Palet%3C%2Fp%3E%3Cdiv%3E%3C%2Fdiv%3E%27%3Blet%20mO%3DcO%28mH%2Co%3D%3E_rm%28o%29%29%3Bfunction%20tM%28%29%7Bif%28mO.parentNode%29_rm%28mO%29%3B%7Dfunction%20o1%28%29%7BtM%28%29%3BdC%28function%28text%29%7Bif%28%21text.trim%28%29%29return%3Blet%20cm%3Dtext.split%28%22%5Cn%22%29%3Blet%20i%3D0%3Blet%20prog%3DcP%28%22Comentaris%3A%200%20%2F%20%22%2Bcm.length%29%3Bfunction%20run%28%29%7Bif%28i%3E%3Dcm.length%29%7BsP%28prog%2C%22Tots%20els%20comentaris%20processats%21%20%E2%9C%93%22%29%3Breturn%3B%7DsP%28prog%2C%22Comentaris%3A%20%22%2B%28i%2B1%29%2B%22%20%2F%20%22%2Bcm.length%29%3Blet%20oB%3D_q%28%22a%5Bdata-ng-click%3D%27showCommentsModal%28%29%27%5D%22%29%3Bif%28%21oB%29%7B_st%28run%2C500%29%3Breturn%3B%7DoB.click%28%29%3Blet%20wM%3DsetInterval%28function%28%29%7Blet%20ta%3D_q%28%22textarea%5Bdata-ng-model%3D%27comentariGeneral.comentari%27%5D%22%29%3Blet%20sC%3D_q%28%22a%5Bdata-ng-click%3D%27saveComentariGeneral%28%29%27%5D%22%29%3Bif%28ta%26%26sC%29%7BclearInterval%28wM%29%3Blet%20c%3D%28cm%5Bi%5D%7C%7C%22%22%29.trim%28%29%3Bif%28c%21%3D%3D%22%22%29%7Bta.value%3Dc%3Bta.dispatchEvent%28new%20InputEvent%28%22input%22%2C%7Bbubbles%3Atrue%7D%29%29%3BsC.click%28%29%3B%7D_st%28function%28%29%7Blet%20sG%3D_q%28%22a%5Bdata-ng-click%3D%27saveNotesAvaluacio%28%29%27%5D%22%29%3Bif%28sG%29sG.click%28%29%3Blet%20wS%3DsetInterval%28function%28%29%7Blet%20alerts%3D_qa%28%22.alert-success%22%29%3Blet%20found%3Dfalse%3Balerts.forEach%28function%28a%29%7Bif%28a.innerText.toLowerCase%28%29.includes%28%22desat%22%29%29found%3Dtrue%3B%7D%29%3Bif%28found%29%7BclearInterval%28wS%29%3Blet%20next%3D_q%28%22a%5Bdata-ng-click%3D%5C%22canviAlumne%28%27next%27%29%5C%22%5D%22%29%3Bif%28%21next%7C%7Cnext.disabled%29%7BsP%28prog%2C%22Tots%20els%20comentaris%20processats%21%20%E2%9C%93%22%29%3Breturn%3B%7Dangular.element%28next%29.triggerHandler%28%27click%27%29%3Bi%2B%2B%3B_st%28run%2C7000%29%3B%7D%7D%2C500%29%3B%7D%2C2000%29%3B%7D%7D%2C200%29%3B%7Drun%28%29%3B%7D%29%3B%7Dfunction%20o2%28%29%7BtM%28%29%3Blet%20total%3D0%2Cmm%3D%7B%7D%2Csm%3D%7B%7D%2CaP%3Dnew%20Set%28%29%2CmC%3D%7B%7D%2Cal%3D%5B%5D%3Blet%20prog%3DcP%28%22Alumnes%3A%200%22%29%3Bfunction%20gS%28%29%7Breturn%20Array.from%28_qa%28%22select%5Bdata-ng-model%3D%27contingut.qualitativa%27%5D%22%29%29.filter%28s%3D%3Es.offsetParent%21%3D%3Dnull%29%3B%7Dfunction%20pr%28%29%7Blet%20selects%3DgS%28%29%3Blet%20bt%3D_q%28%22a.btn.btn-warning%5Bdata-ng-click%3D%27showCommentsModal%28%29%27%5D%22%29%3Bif%28%21bt%29return%3Blet%20alumID%3Dbt.closest%28%22tr%22%29%3Fbt.closest%28%22tr%22%29.textContent.trim%28%29%3Atotal%3Bif%28aP.has%28alumID%29%29return%3BaP.add%28alumID%29%3Blet%20susp%3D0%2CmatsSusp%3D%5B%5D%3Bselects.forEach%28sel%3D%3E%7Blet%20tr%3Dsel.closest%28%22tr%22%29%3Blet%20td%3Dtr%3Ftr.querySelector%28%22td%5Bdata-ng-if%2A%3D%27matPNomVis%27%5D%22%29%3Anull%3Bif%28td%29%7Blet%20mat%3Dtd.textContent.trim%28%29%3Blet%20matID%3DalumID%2B%22%7C%7C%22%2Bmat%3Bif%28%21mC%5BmatID%5D%29%7BmC%5BmatID%5D%3Dtrue%3Blet%20nota%3Dsel.value.replace%28%22string%3A%22%2C%22%22%29%3Bif%28nota%3D%3D%3D%22NA%22%29%7Bmm%5Bmat%5D%3D%28mm%5Bmat%5D%7C%7C0%29%2B1%3Bsusp%2B%2B%3BmatsSusp.push%28mat%29%3B%7Delse%7Bmm%5Bmat%5D%3Dmm%5Bmat%5D%7C%7C0%3B%7D%7D%7D%7D%29%3Bsm%5BalumID%5D%3Dsusp%3Bal.push%28%7Bnum%3Atotal%2B1%2Ccount%3Asusp%2Cmats%3AmatsSusp%7D%29%3Btotal%2B%2B%3BsP%28prog%2C%22Alumnes%3A%20%22%2Btotal%29%3B%7Dfunction%20sg%28%29%7Blet%20next%3D_q%28%22a%5Bdata-ng-click%3D%5C%22canviAlumne%28%27next%27%29%5C%22%5D%22%29%3Bif%28next%26%26%21next.hasAttribute%28%22disabled%22%29%29%7Bangular.element%28next%29.triggerHandler%28%27click%27%29%3Breturn%20true%3B%7Dreturn%20false%3B%7Dfunction%20eE%28cb%29%7Blet%20lC%3D0%2CsT%3D0%3Blet%20int%3DsetInterval%28%28%29%3D%3E%7Blet%20count%3DgS%28%29.length%3Blet%20bt%3D_q%28%22a.btn.btn-warning%5Bdata-ng-click%3D%27showCommentsModal%28%29%27%5D%22%29%3Bif%28bt%26%26count%3D%3D%3DlC%26%26count%3E0%29%7BsT%2B%3D100%3Bif%28sT%3E%3D500%29%7BclearInterval%28int%29%3Bcb%28%29%3B%7D%7Delse%7BsT%3D0%3BlC%3Dcount%3B%7D%7D%2C100%29%3B%7Dfunction%20acabar%28%29%7BsP%28prog%2C%22Processament%20complet%21%20%E2%9C%93%22%29%3BmR%28total%2Cmm%2Csm%2Cal%29%3B%7Dfunction%20loop%28%29%7BeE%28%28%29%3D%3E%7Bpr%28%29%3Bif%28sg%28%29%29%7B_st%28loop%2C150%29%3B%7Delse%7Bacabar%28%29%3B%7D%7D%29%3B%7Dloop%28%29%3B%7Dfunction%20o3%28%29%7BtM%28%29%3BdC%28function%28text%29%7Bif%28%21text.trim%28%29%29return%3Blet%20cm%3Dtext.split%28%22%5Cn%22%29%3Blet%20i%3D0%3Blet%20total%3D0%2Cmm%3D%7B%7D%2Csm%3D%7B%7D%2CaP%3Dnew%20Set%28%29%2CmC%3D%7B%7D%2Cal%3D%5B%5D%3Blet%20prog%3DcP%28%22Processant%3A%200%20%2F%20%22%2Bcm.length%29%3Bfunction%20gS%28%29%7Breturn%20Array.from%28_qa%28%22select%5Bdata-ng-model%3D%27contingut.qualitativa%27%5D%22%29%29.filter%28s%3D%3Es.offsetParent%21%3D%3Dnull%29%3B%7Dfunction%20pD%28%29%7Blet%20selects%3DgS%28%29%3Blet%20bt%3D_q%28%22a.btn.btn-warning%5Bdata-ng-click%3D%27showCommentsModal%28%29%27%5D%22%29%3Bif%28%21bt%29return%3Blet%20alumID%3Dbt.closest%28%22tr%22%29%3Fbt.closest%28%22tr%22%29.textContent.trim%28%29%3Atotal%3Bif%28aP.has%28alumID%29%29return%3BaP.add%28alumID%29%3Blet%20susp%3D0%2CmatsSusp%3D%5B%5D%3Bselects.forEach%28sel%3D%3E%7Blet%20tr%3Dsel.closest%28%22tr%22%29%3Blet%20td%3Dtr%3Ftr.querySelector%28%22td%5Bdata-ng-if%2A%3D%27matPNomVis%27%5D%22%29%3Anull%3Bif%28td%29%7Blet%20mat%3Dtd.textContent.trim%28%29%3Blet%20matID%3DalumID%2B%22%7C%7C%22%2Bmat%3Bif%28%21mC%5BmatID%5D%29%7BmC%5BmatID%5D%3Dtrue%3Blet%20nota%3Dsel.value.replace%28%22string%3A%22%2C%22%22%29%3Bif%28nota%3D%3D%3D%22NA%22%29%7Bmm%5Bmat%5D%3D%28mm%5Bmat%5D%7C%7C0%29%2B1%3Bsusp%2B%2B%3BmatsSusp.push%28mat%29%3B%7Delse%7Bmm%5Bmat%5D%3Dmm%5Bmat%5D%7C%7C0%3B%7D%7D%7D%7D%29%3Bsm%5BalumID%5D%3Dsusp%3Bal.push%28%7Bnum%3Atotal%2B1%2Ccount%3Asusp%2Cmats%3AmatsSusp%7D%29%3Btotal%2B%2B%3B%7Dfunction%20eE%28cb%29%7Blet%20lC%3D0%2CsT%3D0%3Blet%20int%3DsetInterval%28%28%29%3D%3E%7Blet%20count%3DgS%28%29.length%3Blet%20bt%3D_q%28%22a.btn.btn-warning%5Bdata-ng-click%3D%27showCommentsModal%28%29%27%5D%22%29%3Bif%28bt%26%26count%3D%3D%3DlC%26%26count%3E0%29%7BsT%2B%3D100%3Bif%28sT%3E%3D500%29%7BclearInterval%28int%29%3Bcb%28%29%3B%7D%7Delse%7BsT%3D0%3BlC%3Dcount%3B%7D%7D%2C100%29%3B%7Dfunction%20aA%28%29%7BsP%28prog%2C%22Tot%20processat%21%20%E2%9C%93%22%29%3BmR%28total%2Cmm%2Csm%2Cal%29%3B%7Dfunction%20dP%28last%29%7B_st%28function%28%29%7Blet%20sG%3D_q%28%22a%5Bdata-ng-click%3D%27saveNotesAvaluacio%28%29%27%5D%22%29%3Bif%28sG%29sG.click%28%29%3Blet%20wS%3DsetInterval%28function%28%29%7Blet%20alerts%3D_qa%28%22.alert-success%22%29%3Blet%20found%3Dfalse%3Balerts.forEach%28function%28a%29%7Bif%28a.innerText.toLowerCase%28%29.includes%28%22desat%22%29%29found%3Dtrue%3B%7D%29%3Bif%28found%29%7BclearInterval%28wS%29%3Bif%28last%29%7BaA%28%29%3Breturn%3B%7Dlet%20next%3D_q%28%22a%5Bdata-ng-click%3D%5C%22canviAlumne%28%27next%27%29%5C%22%5D%22%29%3Bif%28%21next%7C%7Cnext.hasAttribute%28%22disabled%22%29%29%7BaA%28%29%3Breturn%3B%7Dangular.element%28next%29.triggerHandler%28%27click%27%29%3Bi%2B%2B%3B_st%28rC%2C7000%29%3B%7D%7D%2C500%29%3B%7D%2C2000%29%3B%7Dfunction%20eC%28last%29%7Blet%20c%3D%28cm%5Bi%5D%7C%7C%22%22%29.trim%28%29%3Bif%28c%3D%3D%3D%22%22%29%7BdP%28last%29%3Breturn%3B%7Dlet%20oB%3D_q%28%22a%5Bdata-ng-click%3D%27showCommentsModal%28%29%27%5D%22%29%3Bif%28%21oB%29%7B_st%28%28%29%3D%3EeC%28last%29%2C500%29%3Breturn%3B%7DoB.click%28%29%3Blet%20wM%3DsetInterval%28function%28%29%7Blet%20ta%3D_q%28%22textarea%5Bdata-ng-model%3D%27comentariGeneral.comentari%27%5D%22%29%3Blet%20sC%3D_q%28%22a%5Bdata-ng-click%3D%27saveComentariGeneral%28%29%27%5D%22%29%3Bif%28ta%26%26sC%29%7BclearInterval%28wM%29%3Bta.value%3Dc%3Bta.dispatchEvent%28new%20InputEvent%28%22input%22%2C%7Bbubbles%3Atrue%7D%29%29%3BsC.click%28%29%3BdP%28last%29%3B%7D%7D%2C200%29%3B%7Dfunction%20rC%28%29%7BsP%28prog%2C%22Processant%3A%20%22%2B%28i%2B1%29%2B%22%20%2F%20%22%2Bcm.length%29%3BeE%28%28%29%3D%3E%7BpD%28%29%3Blet%20next%3D_q%28%22a%5Bdata-ng-click%3D%5C%22canviAlumne%28%27next%27%29%5C%22%5D%22%29%3Blet%20isLast%3D%21next%7C%7Cnext.hasAttribute%28%22disabled%22%29%3BeC%28isLast%29%3B%7D%29%3B%7DrC%28%29%3B%7D%29%3B%7D_id%28%22btn1%22%29.onclick%3Do1%3B_id%28%22btn2%22%29.onclick%3Do2%3B_id%28%22btn3%22%29.onclick%3Do3%3B_id%28%22btnX%22%29.onclick%3DtM%3B%7Delse%20if%28isM%29%7Bif%28_id%28%27esfera-overlay%27%29%29return%3Bconst%20ov%3D_c%28%27div%27%29%3Bov.id%3D%27esfera-overlay%27%3Bov.style.cssText%3D%27position%3Afixed%3Btop%3A0%3Bleft%3A0%3Bwidth%3A100%25%3Bheight%3A100%25%3Bbackground%3Argba%280%2C0%2C0%2C0.45%29%3Bz-index%3A99999%3Bdisplay%3Aflex%3Balign-items%3Acenter%3Bjustify-content%3Acenter%3B%27%3Bconst%20md%3D_c%28%27div%27%29%3Bmd.style.cssText%3D%27background%3A%23fff%3Bborder-radius%3A12px%3Bpadding%3A24px%3Bwidth%3A420px%3Bmax-width%3A90vw%3Bmax-height%3A85vh%3Boverflow-y%3Aauto%3Bfont-family%3Asans-serif%3Bcolor%3A%23111%3Bbox-sizing%3Aborder-box%3B%27%3Bfunction%20close%28%29%7Bov.remove%28%29%3B%7Dov.addEventListener%28%27click%27%2Ce%3D%3E%7Bif%28e.target%3D%3D%3Dov%29close%28%29%3B%7D%29%3Bfunction%20gR%28%29%7Breturn%20Array.from%28_qa%28%27%23my-tab-content%20tbody%20tr%27%29%29.filter%28r%3D%3E%7Bconst%20s%3Dr.querySelector%28%27td%3Anth-child%286%29%3Ediv%3Ediv%3Eselect%27%29%7C%7Cr.querySelector%28%27td%3Anth-child%286%29%20input%5Btype%3D%22text%22%5D%27%29%7C%7Cr.querySelector%28%27td%3Anth-child%286%29%20input%5Btype%3D%22number%22%5D%27%29%7C%7Cr.querySelector%28%27td%3Anth-child%286%29%20input%27%29%3Bconst%20td%3Dr.querySelector%28%27td%3Anth-child%281%29%27%29%3Breturn%20s%26%26%21s.disabled%26%26%21%28td%26%26td.classList.contains%28%27cursiva%27%29%29%3B%7D%29%3B%7Dfunction%20gN%28row%29%7Bconst%20td%3Drow.querySelector%28%27td%3Anth-child%282%29%27%29%3Breturn%20td%3Ftd.textContent.trim%28%29%3A%27%27%3B%7Dfunction%20rN%28row%29%7Bconst%20s%3Drow.querySelector%28%27td%3Anth-child%286%29%3Ediv%3Ediv%3Eselect%27%29%3Bif%28s%29return%20s.value%26%26s.value%21%3D%3D%27%27%26%26s.value%21%3D%3D%27string%3A%27%3Bconst%20inp%3Drow.querySelector%28%27td%3Anth-child%286%29%20input%5Btype%3D%22text%22%5D%27%29%7C%7Crow.querySelector%28%27td%3Anth-child%286%29%20input%5Btype%3D%22number%22%5D%27%29%7C%7Crow.querySelector%28%27td%3Anth-child%286%29%20input%27%29%3Breturn%20inp%26%26inp.value%26%26inp.value.trim%28%29%21%3D%3D%27%27%3B%7Dfunction%20rCm%28row%29%7Bconst%20btn%3Drow.querySelector%28%27a.glyphicon.glyphicon-new-window%27%29%3Bif%28%21btn%29return%20false%3Bconst%20td%3Dbtn.closest%28%27td%27%29%3Bif%28%21td%29return%20false%3Bif%28td.querySelector%28%27.badge%2C.label%2Cspan%5Bclass%2A%3D%22comment%22%5D%2Cspan%5Bclass%2A%3D%22count%22%5D%27%29%29return%20true%3Bconst%20txt%3DArray.from%28td.childNodes%29.filter%28n%3D%3En.nodeType%3D%3D%3D3%29.map%28n%3D%3En.textContent.trim%28%29%29.join%28%27%27%29%3Bif%28%2F%5Cd%2B%2F.test%28txt%29%29return%20true%3Bif%28btn.classList.length%3E2%29return%20true%3Bif%28btn.getAttribute%28%27title%27%29%7C%7Cbtn.getAttribute%28%27data-original-title%27%29%29return%20true%3Breturn%20false%3B%7Dfunction%20hN%28%29%7Breturn%20gR%28%29.some%28rN%29%3B%7Dfunction%20hC%28%29%7Breturn%20gR%28%29.some%28rCm%29%3B%7Dfunction%20aN%28text%2Cidx2%2CwM%29%7Bconst%20grades%3Dtext.split%28%27%5Cn%27%29.map%28s%3D%3Es.split%28%27%5Ct%27%29%29%3Bconst%20rows%3DgR%28%29%3Bconst%20tg%3Didx2%21%3D%3Dnull%3Fidx2.map%28i%3D%3Erows%5Bi%5D%29%3Arows%3Bconst%20sk%3D%5B%5D%3Bfor%28let%20i%3D0%3Bi%3Cgrades.length%26%26i%3Ctg.length%3Bi%2B%2B%29%7Bconst%20row%3Dtg%5Bi%5D%3Bif%28%21row%29continue%3Bif%28wM%3D%3D%3D%27skip%27%26%26rN%28row%29%29%7Bsk.push%28gN%28row%29%29%3Bcontinue%3B%7Dconst%20sg%3Dgrades%5Bi%5D%3Bfor%28let%20j%3D0%3Bj%3Csg.length%3Bj%2B%2B%29%7Bif%28sg%5Bj%5D%21%3D%3D%27%27%29%7Bconst%20sel%3Drow.querySelector%28%60td%3Anth-child%28%24%7B6%2Bj%7D%29%3Ediv%3Ediv%3Eselect%60%29%3Bif%28sel%29%7Bsel.value%3D%27string%3A%27%2Bsg%5Bj%5D.trim%28%29%3Bsel.dispatchEvent%28new%20Event%28%27change%27%29%29%3B%7Delse%7Bconst%20inp%3Drow.querySelector%28%60td%3Anth-child%28%24%7B6%2Bj%7D%29%20input%5Btype%3D%22text%22%5D%60%29%7C%7Crow.querySelector%28%60td%3Anth-child%28%24%7B6%2Bj%7D%29%20input%5Btype%3D%22number%22%5D%60%29%7C%7Crow.querySelector%28%60td%3Anth-child%28%24%7B6%2Bj%7D%29%20input%60%29%3Bif%28inp%29%7Binp.value%3Dsg%5Bj%5D.trim%28%29%3Binp.dispatchEvent%28new%20Event%28%27input%27%2C%7Bbubbles%3Atrue%7D%29%29%3Binp.dispatchEvent%28new%20Event%28%27change%27%2C%7Bbubbles%3Atrue%7D%29%29%3B%7D%7D%7D%7D%7Dreturn%20sk%3B%7Dfunction%20aC%28text%2Cidx2%2CwM%2Ccb%29%7Bconst%20cm%3Dtext.split%28%27%5Cn%27%29%3Bconst%20rows%3DgR%28%29%3Bconst%20tg%3Didx2%21%3D%3Dnull%3Fidx2.map%28i%3D%3Erows%5Bi%5D%29%3Arows%3Bconst%20sk%3D%5B%5D%3Bfunction%20next%28i%29%7Bif%28i%3E%3Dcm.length%7C%7Ci%3E%3Dtg.length%29%7Bcb%28sk%29%3Breturn%3B%7Dconst%20row%3Dtg%5Bi%5D%3Bif%28%21row%29%7Bnext%28i%2B1%29%3Breturn%3B%7Dif%28wM%3D%3D%3D%27skip%27%26%26rCm%28row%29%29%7Bsk.push%28gN%28row%29%29%3Bnext%28i%2B1%29%3Breturn%3B%7Dconst%20btn%3Drow.querySelector%28%27a.glyphicon.glyphicon-new-window%27%29%3Bif%28%21btn%29%7Bnext%28i%2B1%29%3Breturn%3B%7Dbtn.click%28%29%3B_st%28%28%29%3D%3E%7Bconst%20ta%3D_q%28%27textarea.form-control%27%29%3Bconst%20save%3D_q%28%27a.btn.btn-primary%5Bdata-ng-click%3D%22vm.modalSave%28%29%22%5D%27%29%3Bif%28%21ta%7C%7C%21save%29%7Bnext%28i%29%3Breturn%3B%7Dta.value%3Dcm%5Bi%5D%3Bta.dispatchEvent%28new%20InputEvent%28%27input%27%2C%7Bbubbles%3Atrue%2CinputType%3A%27insertText%27%2Cdata%3Acm%5Bi%5D%7D%29%29%3Bsave.click%28%29%3B_st%28%28%29%3D%3Enext%28i%2B1%29%2C500%29%3B%7D%2C500%29%3B%7Dnext%280%29%3B%7Dconst%20clrs%3D%7Bnotes%3A%27%234e7f4e%27%2Ccomentaris%3A%27%233d6b9e%27%2Cambdos%3A%27%237a4e9e%27%7D%3Bconst%20lbls%3D%7Bnotes%3A%27Aplicar%20notes%27%2Ccomentaris%3A%27Aplicar%20comentaris%27%2Cambdos%3A%27Aplicar%20notes%20i%20comentaris%27%7D%3Bfunction%20mkBtn%28txt%2Cbg%2Cfn%29%7Bconst%20b%3D_c%28%27button%27%29%3Bb.textContent%3Dtxt%3Bb.style.cssText%3D%60display%3Ablock%3Bwidth%3A100%25%3Bpadding%3A12px%2016px%3Bmargin-bottom%3A8px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%24%7Bbg%7D%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3Btext-align%3Aleft%3B%60%3Bb.onclick%3Dfn%3Breturn%20b%3B%7Dfunction%20mkCancel%28txt%2Cfn%29%7Bconst%20b%3D_c%28%27button%27%29%3Bb.textContent%3Dtxt%7C%7C%27Cancel%C2%B7lar%27%3Bb.style.cssText%3D%27width%3A100%25%3Bpadding%3A9px%3Bborder%3A1px%20solid%20%23ccc%3Bborder-radius%3A8px%3Bbackground%3Atransparent%3Bfont-size%3A13px%3Bcursor%3Apointer%3Bcolor%3A%23666%3Bmargin-top%3A4px%3B%27%3Bb.onclick%3Dfn%7C%7Cclose%3Breturn%20b%3B%7Dfunction%20mkBack%28fn%29%7Bconst%20b%3D_c%28%27button%27%29%3Bb.textContent%3D%27%E2%86%90%20Tornar%27%3Bb.style.cssText%3D%27background%3Anone%3Bborder%3Anone%3Bcolor%3A%23666%3Bfont-size%3A13px%3Bcursor%3Apointer%3Bpadding%3A0%3Bmargin-bottom%3A16px%3Bdisplay%3Ablock%3B%27%3Bb.onclick%3Dfn%3Breturn%20b%3B%7Dfunction%20mkLbl%28txt%29%7Bconst%20l%3D_c%28%27label%27%29%3Bl.textContent%3Dtxt%3Bl.style.cssText%3D%27display%3Ablock%3Bfont-weight%3A500%3Bfont-size%3A13px%3Bcolor%3A%23555%3Bmargin-bottom%3A4px%3B%27%3Breturn%20l%3B%7Dfunction%20mkTA%28ph%29%7Bconst%20t%3D_c%28%27textarea%27%29%3Bt.placeholder%3Dph%3Bt.style.cssText%3D%27width%3A100%25%3Bheight%3A80px%3Bbox-sizing%3Aborder-box%3Bborder%3A1px%20solid%20%23ccc%3Bborder-radius%3A6px%3Bpadding%3A6px%208px%3Bfont-size%3A12px%3Bfont-family%3Amonospace%3Bmargin-bottom%3A12px%3Bresize%3Avertical%3B%27%3Breturn%20t%3B%7Dfunction%20sS%28skN%2CskC%29%7Bconst%20allNames%3D%5B...new%20Set%28%5B...skN%2C...skC%5D%29%5D%3Bif%28%21allNames.length%29%7Bclose%28%29%3Breturn%3B%7Dmd.innerHTML%3D%27%27%3Bconst%20ic%3D_c%28%27div%27%29%3Bic.textContent%3D%27%E2%9A%A0%27%3Bic.style.cssText%3D%27font-size%3A26px%3Bmargin-bottom%3A8px%3B%27%3Bmd.ap%28ic%29%3Bconst%20h%3D_c%28%27p%27%29%3Bh.style.cssText%3D%27font-weight%3A500%3Bfont-size%3A15px%3Bmargin%3A0%200%206px%3B%27%3Bh.textContent%3D%27Alumnes%20no%20modificats%27%3Bmd.ap%28h%29%3Bconst%20setN%3Dnew%20Set%28skN%29%3Bconst%20setC%3Dnew%20Set%28skC%29%3Bconst%20parts%3D%5B%5D%3Bif%28skN.length%29parts.push%28%27notes%27%29%3Bif%28skC.length%29parts.push%28%27comentaris%27%29%3Bconst%20sub%3D_c%28%27p%27%29%3Bsub.style.cssText%3D%27font-size%3A13px%3Bcolor%3A%23666%3Bmargin%3A0%200%2012px%3Bline-height%3A1.5%3B%27%3Bsub.textContent%3D%60Els%20alumnes%20seg%C3%BCents%20ja%20tenien%20%24%7Bparts.join%28%27%20o%20%27%29%7D%20i%20no%20s%27han%20sobreescrit%3A%60%3Bmd.ap%28sub%29%3Bconst%20ul%3D_c%28%27ul%27%29%3Bul.style.cssText%3D%27font-size%3A13px%3Bmargin%3A0%200%2016px%3Bpadding-left%3A18px%3Bline-height%3A1.9%3Bmax-height%3A200px%3Boverflow-y%3Aauto%3B%27%3BallNames.forEach%28name%3D%3E%7Bconst%20li%3D_c%28%27li%27%29%3Bconst%20tags%3D%5B%5D%3Bif%28setN.has%28name%29%29tags.push%28%27notes%27%29%3Bif%28setC.has%28name%29%29tags.push%28%27comentaris%27%29%3Bli.textContent%3D%60%24%7Bname%7D%20%28%24%7Btags.join%28%27%2C%20%27%29%7D%29%60%3Bul.ap%28li%29%3B%7D%29%3Bmd.ap%28ul%29%3Bconst%20ok%3D_c%28%27button%27%29%3Bok.textContent%3D%27Tancar%27%3Bok.style.cssText%3D%27width%3A100%25%3Bpadding%3A11px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%23555%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3B%27%3Bok.onclick%3Dclose%3Bmd.ap%28ok%29%3B%7Dfunction%20sF%28mode%2Cidx2%2CwM%29%7Bmd.innerHTML%3D%27%27%3Bmd.ap%28mkBack%28%28%29%3D%3EsPk%28mode%2CwM%29%29%29%3Blet%20nTA%3Dnull%2CcTA%3Dnull%3Bif%28mode%3D%3D%3D%27notes%27%7C%7Cmode%3D%3D%3D%27ambdos%27%29%7Bmd.ap%28mkLbl%28%27Notes%27%29%29%3BnTA%3DmkTA%28%22Enganxa%20les%20notes%20des%20d%27Excel%22%29%3Bmd.ap%28nTA%29%3B%7Dif%28mode%3D%3D%3D%27comentaris%27%7C%7Cmode%3D%3D%3D%27ambdos%27%29%7Bmd.ap%28mkLbl%28%27Comentaris%27%29%29%3BcTA%3DmkTA%28%27Enganxa%20els%20comentaris%20%28un%20per%20l%C3%ADnia%29%27%29%3Bmd.ap%28cTA%29%3B%7Dconst%20ap%3D_c%28%27button%27%29%3Bap.textContent%3Dlbls%5Bmode%5D%3Bap.style.cssText%3D%60width%3A100%25%3Bpadding%3A11px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%24%7Bclrs%5Bmode%5D%7D%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3B%60%3Bap.onclick%3D%28%29%3D%3E%7Bconst%20skN%3DnTA%3FaN%28nTA.value%2Cidx2%2CwM%29%3A%5B%5D%3Bif%28cTA%29%7BaC%28cTA.value%2Cidx2%2CwM%2CskC%3D%3EsS%28skN%2CskC%29%29%3B%7Delse%7BsS%28skN%2C%5B%5D%29%3B%7D%7D%3Bmd.ap%28ap%29%3B%7Dfunction%20sPk%28mode%2CwM%29%7Bmd.innerHTML%3D%27%27%3Bmd.ap%28mkBack%28%28%29%3D%3EsSc%28mode%2CwM%29%29%29%3Bconst%20rows%3DgR%28%29%3Bconst%20h%3D_c%28%27p%27%29%3Bh.textContent%3D%27Selecciona%20els%20alumnes%27%3Bh.style.cssText%3D%27font-weight%3A500%3Bfont-size%3A15px%3Bmargin%3A0%200%2010px%3B%27%3Bmd.ap%28h%29%3Bconst%20sr%3D_c%28%27div%27%29%3Bsr.style.cssText%3D%27display%3Aflex%3Bgap%3A8px%3Bmargin-bottom%3A8px%3B%27%3Bconst%20sA%3D_c%28%27button%27%29%3BsA.textContent%3D%27Tots%27%3BsA.style.cssText%3D%27flex%3A1%3Bpadding%3A5px%3Bborder%3A1px%20solid%20%23ccc%3Bborder-radius%3A6px%3Bbackground%3Atransparent%3Bfont-size%3A12px%3Bcursor%3Apointer%3B%27%3Bconst%20sN%3D_c%28%27button%27%29%3BsN.textContent%3D%27Cap%27%3BsN.style.cssText%3D%27flex%3A1%3Bpadding%3A5px%3Bborder%3A1px%20solid%20%23ccc%3Bborder-radius%3A6px%3Bbackground%3Atransparent%3Bfont-size%3A12px%3Bcursor%3Apointer%3B%27%3Bsr.ap%28sA%29%3Bsr.ap%28sN%29%3Bmd.ap%28sr%29%3Bconst%20ld%3D_c%28%27div%27%29%3Bld.style.cssText%3D%27max-height%3A220px%3Boverflow-y%3Aauto%3Bborder%3A1px%20solid%20%23eee%3Bborder-radius%3A6px%3Bmargin-bottom%3A12px%3B%27%3Bconst%20cbs%3D%5B%5D%3Brows.forEach%28%28row%2Ci%29%3D%3E%7Bconst%20name%3DgN%28row%29%7C%7C%60Alumne%20%24%7Bi%2B1%7D%60%3Bconst%20item%3D_c%28%27label%27%29%3Bitem.style.cssText%3D%27display%3Aflex%3Balign-items%3Acenter%3Bgap%3A8px%3Bpadding%3A7px%2010px%3Bcursor%3Apointer%3Bborder-bottom%3A1px%20solid%20%23f5f5f5%3Bfont-size%3A13px%3B%27%3Bconst%20cb%3D_c%28%27input%27%29%3Bcb.type%3D%27checkbox%27%3Bcb.checked%3Dtrue%3Bcbs.push%28cb%29%3Bitem.ap%28cb%29%3Bitem.ap%28document.createTextNode%28name%29%29%3Bld.ap%28item%29%3B%7D%29%3Bmd.ap%28ld%29%3BsA.onclick%3D%28%29%3D%3Ecbs.forEach%28c%3D%3Ec.checked%3Dtrue%29%3BsN.onclick%3D%28%29%3D%3Ecbs.forEach%28c%3D%3Ec.checked%3Dfalse%29%3Bconst%20ap%3D_c%28%27button%27%29%3Bap.textContent%3D%27Continuar%27%3Bap.style.cssText%3D%60width%3A100%25%3Bpadding%3A11px%3Bborder%3Anone%3Bborder-radius%3A8px%3Bbackground%3A%24%7Bclrs%5Bmode%5D%7D%3Bcolor%3A%23fff%3Bfont-size%3A14px%3Bfont-weight%3A500%3Bcursor%3Apointer%3B%60%3Bap.onclick%3D%28%29%3D%3E%7Bconst%20idx%3Dcbs.map%28%28c%2Ci%29%3D%3Ec.checked%3Fi%3Anull%29.filter%28i%3D%3Ei%21%3D%3Dnull%29%3Bif%28%21idx.length%29return%3BsF%28mode%2Cidx%2CwM%29%3B%7D%3Bmd.ap%28ap%29%3B%7Dfunction%20sSc%28mode%2CwM%29%7Bmd.innerHTML%3D%27%27%3Bmd.ap%28mkBack%28sCh%29%29%3Bconst%20h%3D_c%28%27p%27%29%3Bh.textContent%3D%27A%20quins%20alumnes%3F%27%3Bh.style.cssText%3D%27font-weight%3A500%3Bfont-size%3A16px%3Bmargin%3A0%200%2016px%3B%27%3Bmd.ap%28h%29%3Bmd.ap%28mkBtn%28%27Tots%20els%20alumnes%20del%20grup%27%2Cclrs%5Bmode%5D%2C%28%29%3D%3EsF%28mode%2Cnull%2CwM%29%29%29%3Bmd.ap%28mkBtn%28%27Escollir%20alumnes%27%2C%27%23888%27%2C%28%29%3D%3EsPk%28mode%2CwM%29%29%29%3B%7Dfunction%20sW%28msg%2Cmode%29%7Bmd.innerHTML%3D%27%27%3Bmd.ap%28mkBack%28sCh%29%29%3Bconst%20ic%3D_c%28%27div%27%29%3Bic.textContent%3D%27%E2%9A%A0%27%3Bic.style.cssText%3D%27font-size%3A28px%3Bmargin-bottom%3A8px%3B%27%3Bmd.ap%28ic%29%3Bconst%20h%3D_c%28%27p%27%29%3Bh.style.cssText%3D%27font-weight%3A500%3Bfont-size%3A15px%3Bmargin%3A0%200%208px%3B%27%3Bh.textContent%3D%27Ja%20hi%20ha%20dades%20existents%27%3Bmd.ap%28h%29%3Bconst%20s%3D_c%28%27p%27%29%3Bs.style.cssText%3D%27font-size%3A13px%3Bcolor%3A%23666%3Bmargin%3A0%200%2016px%3Bline-height%3A1.5%3B%27%3Bs.textContent%3Dmsg%3Bmd.ap%28s%29%3Bmd.ap%28mkBtn%28%27Reescriure%20tot%27%2C%27%23c0392b%27%2C%28%29%3D%3EsSc%28mode%2C%27overwrite%27%29%29%29%3Bmd.ap%28mkBtn%28%27No%20sobreescriure%20els%20que%20ja%20en%20tenen%27%2C%27%23e67e22%27%2C%28%29%3D%3EsSc%28mode%2C%27skip%27%29%29%29%3Bmd.ap%28mkCancel%28%27Cancel%C2%B7lar%27%2Cclose%29%29%3B%7Dfunction%20cAS%28mode%29%7Bconst%20nWarn%3D%28mode%3D%3D%3D%27notes%27%7C%7Cmode%3D%3D%3D%27ambdos%27%29%26%26hN%28%29%3Bconst%20cWarn%3D%28mode%3D%3D%3D%27comentaris%27%7C%7Cmode%3D%3D%3D%27ambdos%27%29%26%26hC%28%29%3Bconst%20parts%3D%5B%5D%3Bif%28nWarn%29parts.push%28%27notes%27%29%3Bif%28cWarn%29parts.push%28%27comentaris%27%29%3Bif%28parts.length%29%7BsW%28%60Ja%20hi%20ha%20%24%7Bparts.join%28%27%20i%20%27%29%7D%20introdu%C3%AFts.%60%2Cmode%29%3B%7Delse%7BsSc%28mode%2C%27overwrite%27%29%3B%7D%7Dfunction%20sCh%28%29%7Bmd.innerHTML%3D%27%27%3Bconst%20h%3D_c%28%27p%27%29%3Bh.style.cssText%3D%27font-weight%3A500%3Bfont-size%3A16px%3Bmargin%3A0%200%2016px%3B%27%3Bh.textContent%3D%27Qu%C3%A8%20vols%20fer%3F%27%3Bmd.ap%28h%29%3Bmd.ap%28mkBtn%28%27Posar%20notes%27%2C%27%234e7f4e%27%2C%28%29%3D%3EcAS%28%27notes%27%29%29%29%3Bmd.ap%28mkBtn%28%27Posar%20comentaris%27%2C%27%233d6b9e%27%2C%28%29%3D%3EcAS%28%27comentaris%27%29%29%29%3Bmd.ap%28mkBtn%28%27Posar%20notes%20i%20comentaris%27%2C%27%237a4e9e%27%2C%28%29%3D%3EcAS%28%27ambdos%27%29%29%29%3Bmd.ap%28mkCancel%28%29%29%3Bconst%20cr%3D_c%28%27p%27%29%3Bcr.textContent%3D%27%C2%A9%202026%20Ignasi%20Mart%C3%AD%20Palet%27%3Bcr.style.cssText%3D%27font-size%3A11px%3Bcolor%3A%239ca3af%3Btext-align%3Acenter%3Bmargin-top%3A14px%3Bmargin-bottom%3A0%27%3Bmd.ap%28cr%29%3B%7DsCh%28%29%3Bov.ap%28md%29%3B_ba%28ov%29%3B%7Delse%7Balert%28%27%E2%9A%A0%EF%B8%8F%20Aquest%20bookmarklet%20nom%C3%A9s%20funciona%20a%3A%5Cn%E2%80%A2%20Qualificacions%20per%20grup%20i%20mat%C3%A8ria%5Cn%E2%80%A2%20Qualificacions%20per%20grup%20i%20alumne%2Fa%27%29%3B%7D%7D%29%28%29%3B%0A'>
+        <span class="icon">🎓</span>
+        Assistent Esfer@
+      </a>
+    </div>
+  </section>
+
+  <section class="steps">
+    <p class="steps-title">Com instal·lar-lo</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Mostra la barra</h3>
+        <p>Si no veus la barra de marcadors, activa-la amb <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Windows/Linux) o <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac).</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Arrossega el botó</h3>
+        <p>Agafa el botó negre i arrossega'l fins a la barra de marcadors del teu navegador. Veuràs un indicador mentre l'arrossegues.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Ja funciona!</h3>
+        <p>Ves a <strong>Qualificacions per grup i matèria</strong> per posar notes i comentaris, o a <strong>Qualificacions per grup i alumne/a</strong> per posar comentaris de tutor i fer l'acta d'avaluació de la tutoria. Fes clic al marcador per activar l'eina.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="compat">
+    <div class="compat-inner">
+      <span class="compat-icon">🌐</span>
+      <div>
+        <h3>Compatibilitat</h3>
+        <p>Funciona a Chrome, Firefox, Edge i Safari. Ves a <strong>Qualificacions per grup i matèria</strong> per posar notes i comentaris, o a <strong>Qualificacions per grup i alumne/a</strong> per posar comentaris de tutor i fer l'acta d'avaluació de la tutoria.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 Ignasi Martí Palet</p>
+  <p>Assistent Esfer@ · Bookmarklet</p>
+</footer>
+
+
+<script>
+  // ════════════════════════════════════════════
+  // CONFIGURACIÓ — omple aquests dos valors
+  // ════════════════════════════════════════════
+  const BIN_ID  = "69fba055adc21f119a62c96d";
+  const API_KEY = "$2a$10$//OpihM1HJp0L7kyc0MGu.dXpcEdJzk78HxYT0eytCzbbWIzxCnC.";
+  // ════════════════════════════════════════════
+  // CONTRASENYA D'ADMINISTRADOR — només la saps tu
+  const ADMIN_PWD = "impTorrentEsfera";
+  // ════════════════════════════════════════════
+
+  const contingut = document.querySelector('main');
+  const cap = document.querySelector('header');
+  const peu = document.querySelector('footer');
+  contingut.style.display = 'none';
+  cap.style.display = 'none';
+  peu.style.display = 'none';
+
+  function mostrar() {
+    contingut.style.display = '';
+    cap.style.display = '';
+    peu.style.display = '';
+    afegirBotoAdmin();
+  }
+
+  // ── Llegeix la contrasenya de JSONbin ──
+  async function obtenirContrasenya() {
+    try {
+      const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': API_KEY }
+      });
+      const d = await r.json();
+      return d.record.contrasenya;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  // ── Actualitza la contrasenya a JSONbin ──
+  async function actualitzarContrasenya(nova) {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+      body: JSON.stringify({ contrasenya: nova })
     });
+    return r.ok;
   }
-  function gN(row){
-    return ['td:nth-child(2)','td:nth-child(3)','td:nth-child(4)']
-      .map(s=>row.querySelector(s)).map(t=>t?t.textContent.trim():'').filter(Boolean).join(' ');
-  }
-  function rN(row){const inp=row.querySelector('input[name="qualitativa"]');return inp&&inp.value.trim()!=='';}
-  function hasComment(row){const btn=row.querySelector('a.glyphicon.glyphicon-new-window');return btn&&!btn.classList.contains('emptyIcon');}
-  function hN(){return gR().some(rN);}
-  function hC(){return gR().some(hasComment);}
 
-  function aN(text,idx2,wM){
-    const vals=text.split('\n').map(s=>s.trim());
-    const rows=gR();
-    const tg=idx2!==null?idx2.map(i=>rows[i]):rows;
-    const sk=[];
-    for(let i=0;i<vals.length&&i<tg.length;i++){
-      const row=tg[i];if(!row)continue;
-      if(wM==='skip'&&rN(row)){sk.push(gN(row));continue;}
-      const v=vals[i];if(v==='')continue;
-      let ok=false;
-      try{
-        const scope=angular.element(row).scope();
-        scope.$apply(()=>{
-          const alumne=scope.alumne||scope.$parent?.alumne;
-          if(!alumne)return;
-          (alumne.asig||[]).forEach(a=>(a.elem||[]).forEach(e=>{
-            if(e.hasOwnProperty('quantitativa'))e.quantitativa=v;
-          }));
-        });
-        ok=true;
-      }catch(e){}
-      if(!ok){
-        const inp=row.querySelector('input[name="qualitativa"]');
-        if(inp){
-          inp.value=v;
-          inp.dispatchEvent(new Event('input',{bubbles:true}));
-          inp.dispatchEvent(new Event('change',{bubbles:true}));
-          try{angular.element(inp).triggerHandler('input');angular.element(inp).triggerHandler('change');}catch(e){}
-        }
+  // ── Pantalla d'accés d'usuari ──
+  function mostrarPantalla(contrasenya) {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:#f7f6f2;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:"Instrument Sans",sans-serif;';
+    ov.innerHTML = `
+      <div style="background:#fff;border:1px solid #e2e1dc;border-radius:20px;padding:40px 36px;width:340px;max-width:90vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.08)">
+        <div style="font-size:36px;margin-bottom:16px">🔒</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#0f0f1a;margin-bottom:6px">Accés restringit</h2>
+        <p style="font-size:13px;color:#9898a8;margin-bottom:24px;line-height:1.5">Introdueix la contrasenya per accedir al bookmarklet</p>
+        <input id="pwd-input" type="password" placeholder="Contrasenya"
+          style="width:100%;padding:12px 14px;border:1.5px solid #e2e1dc;border-radius:10px;font-size:14px;outline:none;font-family:'Instrument Sans',sans-serif;color:#0f0f1a;box-sizing:border-box;margin-bottom:10px;"
+          onkeydown="if(event.key==='Enter')document.getElementById('pwd-btn').click()"
+        />
+        <p id="pwd-error" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:8px"></p>
+        <button id="pwd-btn" style="width:100%;padding:13px;border:none;border-radius:10px;background:#0f0f1a;color:#fff;font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Entrar →</button>
+      </div>`;
+    document.body.appendChild(ov);
+    setTimeout(() => document.getElementById('pwd-input').focus(), 100);
+    document.getElementById('pwd-btn').addEventListener('click', () => {
+      if (document.getElementById('pwd-input').value === contrasenya) {
+        sessionStorage.setItem('auth', 'ok');
+        ov.remove();
+        mostrar();
+      } else {
+        document.getElementById('pwd-error').textContent = 'Contrasenya incorrecta. Torna-ho a intentar.';
+        document.getElementById('pwd-input').value = '';
+        document.getElementById('pwd-input').focus();
       }
-    }
-    return sk;
-  }
-
-  function aC(text,idx2,wM,cb){
-    const cm=text.split('\n').map(s=>s.trim());
-    const rows=gR();
-    const tg=idx2!==null?idx2.map(i=>rows[i]):rows;
-    const sk=[];
-    function next(i){
-      if(i>=cm.length||i>=tg.length){cb(sk);return;}
-      const row=tg[i];if(!row){next(i+1);return;}
-      if(wM==='skip'&&hasComment(row)){sk.push(gN(row));next(i+1);return;}
-      const c=cm[i]||'';
-      const btn=row.querySelector('a.glyphicon.glyphicon-new-window');
-      if(!btn){next(i+1);return;}
-      btn.click();
-      _st(()=>{
-        const ta=_q('textarea[data-ng-model="commentsToModify.commentsToModifyModal"]');
-        const save=_q('a.btn.btn-primary[data-ng-click="modalSave()"]');
-        if(!ta||!save){next(i+1);return;}
-        ta.focus();ta.value=c;
-        ta.dispatchEvent(new Event('input',{bubbles:true}));
-        try{angular.element(ta).triggerHandler('input');}catch(e){}
-        _st(()=>{save.click();_st(()=>next(i+1),500);},200);
-      },700);
-    }
-    next(0);
-  }
-
-  const clrs={notes:'#4e7f4e',comentaris:'#3d6b9e',ambdos:'#7a4e9e'};
-  const lbls={notes:'Aplicar notes',comentaris:'Aplicar comentaris',ambdos:'Aplicar notes i comentaris'};
-  function mkBtn(txt,bg,fn){const b=_c('button');b.textContent=txt;b.style.cssText=`display:block;width:100%;padding:12px 16px;margin-bottom:8px;border:none;border-radius:8px;background:${bg};color:#fff;font-size:14px;font-weight:500;cursor:pointer;text-align:left;`;b.onclick=fn;return b;}
-  function mkCancel(txt,fn){const b=_c('button');b.textContent=txt||'Cancel·lar';b.style.cssText='width:100%;padding:9px;border:1px solid #ccc;border-radius:8px;background:transparent;font-size:13px;cursor:pointer;color:#666;margin-top:4px;';b.onclick=fn||close;return b;}
-  function mkBack(fn){const b=_c('button');b.textContent='← Tornar';b.style.cssText='background:none;border:none;color:#666;font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;display:block;';b.onclick=fn;return b;}
-  function mkLbl(txt){const l=_c('label');l.textContent=txt;l.style.cssText='display:block;font-weight:500;font-size:13px;color:#555;margin-bottom:4px;';return l;}
-  function mkTA(ph){const t=_c('textarea');t.placeholder=ph;t.style.cssText='width:100%;height:80px;box-sizing:border-box;border:1px solid #ccc;border-radius:6px;padding:6px 8px;font-size:12px;font-family:monospace;margin-bottom:12px;resize:vertical;';return t;}
-  function mkCtx(){const b=_c('div');b.textContent=CTX;b.style.cssText='display:inline-block;background:#f0f4ff;color:#3d6b9e;border:1px solid #c5d5f0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;margin-bottom:14px;';return b;}
-
-  function sS(skN,skC){
-    const all=[...new Set([...skN,...skC])];if(!all.length){close();return;}
-    md.innerHTML='';
-    const ic=_c('div');ic.textContent='⚠';ic.style.cssText='font-size:26px;margin-bottom:8px;';md.ap(ic);
-    const h=_c('p');h.style.cssText='font-weight:500;font-size:15px;margin:0 0 6px;';h.textContent='Alumnes no modificats';md.ap(h);
-    const setN=new Set(skN),setC=new Set(skC),parts=[];
-    if(skN.length)parts.push('notes');if(skC.length)parts.push('comentaris');
-    const sub=_c('p');sub.style.cssText='font-size:13px;color:#666;margin:0 0 12px;line-height:1.5;';
-    sub.textContent=`Els alumnes següents ja tenien ${parts.join(' o ')} i no s'han sobreescrit:`;md.ap(sub);
-    const ul=_c('ul');ul.style.cssText='font-size:13px;margin:0 0 16px;padding-left:18px;line-height:1.9;max-height:200px;overflow-y:auto;';
-    all.forEach(name=>{const li=_c('li');const tags=[];if(setN.has(name))tags.push('notes');if(setC.has(name))tags.push('comentaris');li.textContent=`${name} (${tags.join(', ')})`;ul.ap(li);});md.ap(ul);
-    const ok=_c('button');ok.textContent='Tancar';ok.style.cssText='width:100%;padding:11px;border:none;border-radius:8px;background:#555;color:#fff;font-size:14px;font-weight:500;cursor:pointer;';ok.onclick=close;md.ap(ok);
-  }
-  function sF(mode,idx2,wM){
-    md.innerHTML='';md.ap(mkCtx());
-    md.ap(mkBack(()=>idx2===null?sSc(mode,wM):sPk(mode,wM)));
-    let nTA=null,cTA=null;
-    if(mode==='notes'||mode==='ambdos'){md.ap(mkLbl('Notes (una per línia, en el mateix ordre que la taula)'));nTA=mkTA('10\n7\n5\n...');md.ap(nTA);}
-    if(mode==='comentaris'||mode==='ambdos'){md.ap(mkLbl('Comentaris (un per línia)'));cTA=mkTA('Comentari alumne 1\nComentari alumne 2\n...');md.ap(cTA);}
-    const ap=_c('button');ap.textContent=lbls[mode];ap.style.cssText=`width:100%;padding:11px;border:none;border-radius:8px;background:${clrs[mode]};color:#fff;font-size:14px;font-weight:500;cursor:pointer;`;
-    ap.onclick=()=>{const skN=nTA?aN(nTA.value,idx2,wM):[];if(cTA){aC(cTA.value,idx2,wM,skC=>sS(skN,skC));}else{sS(skN,[]);}};
-    md.ap(ap);
-  }
-  function sPk(mode,wM){
-    md.innerHTML='';md.ap(mkCtx());md.ap(mkBack(()=>sSc(mode,wM)));
-    const rows=gR();
-    const h=_c('p');h.textContent='Selecciona els alumnes';h.style.cssText='font-weight:500;font-size:15px;margin:0 0 10px;';md.ap(h);
-    const sr=_c('div');sr.style.cssText='display:flex;gap:8px;margin-bottom:8px;';
-    const sA=_c('button');sA.textContent='Tots';sA.style.cssText='flex:1;padding:5px;border:1px solid #ccc;border-radius:6px;background:transparent;font-size:12px;cursor:pointer;';
-    const sN=_c('button');sN.textContent='Cap';sN.style.cssText='flex:1;padding:5px;border:1px solid #ccc;border-radius:6px;background:transparent;font-size:12px;cursor:pointer;';
-    sr.ap(sA);sr.ap(sN);md.ap(sr);
-    const ld=_c('div');ld.style.cssText='max-height:220px;overflow-y:auto;border:1px solid #eee;border-radius:6px;margin-bottom:12px;';
-    const cbs=[];
-    rows.forEach((row,i)=>{
-      const name=gN(row)||`Alumne ${i+1}`;
-      const item=_c('label');item.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;';
-      const cb=_c('input');cb.type='checkbox';cb.checked=true;cbs.push(cb);
-      item.ap(cb);item.ap(document.createTextNode(name));ld.ap(item);
-    });
-    md.ap(ld);
-    sA.onclick=()=>cbs.forEach(c=>c.checked=true);
-    sN.onclick=()=>cbs.forEach(c=>c.checked=false);
-    const ap=_c('button');ap.textContent='Continuar';ap.style.cssText=`width:100%;padding:11px;border:none;border-radius:8px;background:${clrs[mode]};color:#fff;font-size:14px;font-weight:500;cursor:pointer;`;
-    ap.onclick=()=>{const idx=cbs.map((c,i)=>c.checked?i:null).filter(i=>i!==null);if(!idx.length)return;sF(mode,idx,wM);};
-    md.ap(ap);
-  }
-  function sSc(mode,wM){
-    md.innerHTML='';md.ap(mkCtx());md.ap(mkBack(sCh));
-    const h=_c('p');h.textContent='A quins alumnes?';h.style.cssText='font-weight:500;font-size:16px;margin:0 0 16px;';md.ap(h);
-    md.ap(mkBtn('Tots els alumnes del grup',clrs[mode],()=>sF(mode,null,wM)));
-    md.ap(mkBtn('Escollir alumnes','#888',()=>sPk(mode,wM)));
-  }
-  function sW(msg,mode){
-    md.innerHTML='';md.ap(mkCtx());md.ap(mkBack(sCh));
-    const ic=_c('div');ic.textContent='⚠';ic.style.cssText='font-size:28px;margin-bottom:8px;';md.ap(ic);
-    const h=_c('p');h.style.cssText='font-weight:500;font-size:15px;margin:0 0 8px;';h.textContent='Ja hi ha dades existents';md.ap(h);
-    const s=_c('p');s.style.cssText='font-size:13px;color:#666;margin:0 0 16px;line-height:1.5;';s.textContent=msg;md.ap(s);
-    md.ap(mkBtn('Reescriure tot','#c0392b',()=>sSc(mode,'overwrite')));
-    md.ap(mkBtn('No sobreescriure els que ja en tienen','#e67e22',()=>sSc(mode,'skip')));
-    md.ap(mkCancel('Cancel·lar',close));
-  }
-  function cAS(mode){
-    const nWarn=(mode==='notes'||mode==='ambdos')&&hN();
-    const cWarn=(mode==='comentaris'||mode==='ambdos')&&hC();
-    const parts=[];if(nWarn)parts.push('notes');if(cWarn)parts.push('comentaris');
-    if(parts.length){sW(`Ja hi ha ${parts.join(' i ')} introduïts.`,mode);}else{sSc(mode,'overwrite');}
-  }
-  function sCh(){
-    md.innerHTML='';md.ap(mkCtx());
-    const h=_c('p');h.style.cssText='font-weight:500;font-size:16px;margin:0 0 16px;';h.textContent='Què vols fer?';md.ap(h);
-    md.ap(mkBtn('Posar notes','#4e7f4e',()=>cAS('notes')));
-    md.ap(mkBtn('Posar comentaris','#3d6b9e',()=>cAS('comentaris')));
-    md.ap(mkBtn('Posar notes i comentaris','#7a4e9e',()=>cAS('ambdos')));
-    md.ap(mkCancel());
-    const cr=_c('p');cr.textContent='© 2026 Ignasi Martí Palet';cr.style.cssText='font-size:11px;color:#9ca3af;text-align:center;margin-top:14px;margin-bottom:0';md.ap(cr);
-  }
-  sCh();ov.ap(md);_ba(ov);
-
-// ── QUALIFICACIONS PER GRUP/ALUMNE (isM) ──────────────────────────────────────
-}else if(isM){
-  if(_id('esfera-overlay'))return;
-  const pgURL=window.location.href.toLowerCase();
-  const pgTitle=document.title.toLowerCase();
-  const isBatxCtx=pgURL.includes('batx')||pgTitle.includes('batx');
-  const isFinalCtx=pgURL.includes('final')||pgTitle.includes('final');
-  const CTX=isBatxCtx?'Avaluació parcial Batxillerat':(isFinalCtx?'Avaluació final ESO':'Avaluació parcial ESO');
-
-  const ov=_c('div');ov.id='esfera-overlay';ov.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:99999;display:flex;align-items:center;justify-content:center;';
-  const md=_c('div');md.style.cssText='background:#fff;border-radius:12px;padding:24px;width:420px;max-width:90vw;max-height:85vh;overflow-y:auto;font-family:sans-serif;color:#111;box-sizing:border-box;';
-  function close(){ov.remove();}
-  ov.addEventListener('click',e=>{if(e.target===ov)close();});
-
-  // gR: accepta files ESO (td:nth-child(6)), BATX parcial (input[name="qualitativa"] o botó comentari)
-  function gR(){
-    return Array.from(_qa('#my-tab-content tbody tr')).filter(r=>{
-      if(r.querySelector('.cursiva'))return false; // cursiva en qualsevol lloc de la fila
-      const s6=r.querySelector('td:nth-child(6)>div>div>select')||r.querySelector('td:nth-child(6) input[type="text"]')||r.querySelector('td:nth-child(6) input[type="number"]')||r.querySelector('td:nth-child(6) input');
-      if(s6&&!s6.disabled)return true;
-      const q=r.querySelector('input[name="qualitativa"]');
-      if(q&&!q.disabled)return true;
-      return !!r.querySelector('a.glyphicon-new-window');
     });
   }
-  function gN(row){const td=row.querySelector('td:nth-child(2)');return td?td.textContent.trim():'';}
 
-  // rN: ESO → td:nth-child(6); BATX parcial → qualitativa (valor DOM o classe ng-not-empty)
-  function rN(row){
-    const s=row.querySelector('td:nth-child(6)>div>div>select');
-    if(s)return s.value&&s.value!==''&&s.value!=='string:';
-    const inp=row.querySelector('td:nth-child(6) input[type="text"]')||row.querySelector('td:nth-child(6) input[type="number"]')||row.querySelector('td:nth-child(6) input');
-    if(inp)return inp.value&&inp.value.trim()!=='';
-    const q=row.querySelector('input[name="qualitativa"]');
-    return q&&(q.value.trim()!==''||q.classList.contains('ng-not-empty'));
+  // ── Pantalla de càrrega mentre consulta JSONbin ──
+  function mostrarCarregant() {
+    const ov = document.createElement('div');
+    ov.id = 'loading-ov';
+    ov.style.cssText = 'position:fixed;inset:0;background:#f7f6f2;display:flex;align-items:center;justify-content:center;z-index:9999;';
+    ov.innerHTML = `<p style="font-family:'Instrument Sans',sans-serif;font-size:14px;color:#9898a8;">Carregant...</p>`;
+    document.body.appendChild(ov);
+    return ov;
   }
-  function rCm(row){const btn=row.querySelector('a.glyphicon.glyphicon-new-window');if(!btn)return false;const td=btn.closest('td');if(!td)return false;if(td.querySelector('.badge,.label,span[class*="comment"],span[class*="count"]'))return true;const txt=Array.from(td.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join('');if(/\d+/.test(txt))return true;if(btn.classList.length>2)return true;if(btn.getAttribute('title')||btn.getAttribute('data-original-title'))return true;return false;}
-  function hN(){return gR().some(rN);}
-  function hC(){return gR().some(rCm);}
 
-  function aN(text,idx2,wM){const grades=text.split('\n').map(s=>s.split('\t'));const rows=gR();const tg=idx2!==null?idx2.map(i=>rows[i]):rows;const sk=[];for(let i=0;i<grades.length&&i<tg.length;i++){const row=tg[i];if(!row)continue;if(wM==='skip'&&rN(row)){sk.push(gN(row));continue;}const sg=grades[i];for(let j=0;j<sg.length;j++){if(sg[j]!==''){const sel=row.querySelector(`td:nth-child(${6+j})>div>div>select`);if(sel){sel.value='string:'+sg[j].trim();sel.dispatchEvent(new Event('change'));}else{const inp=row.querySelector(`td:nth-child(${6+j}) input[type="text"]`)||row.querySelector(`td:nth-child(${6+j}) input[type="number"]`)||row.querySelector(`td:nth-child(${6+j}) input`);if(inp){inp.value=sg[j].trim();inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));}}}}}return sk;}
+  // ── Botó discret d'administrador al peu ──
+  function afegirBotoAdmin() {
+    const btn = document.createElement('button');
+    btn.textContent = '⚙';
+    btn.title = 'Administrador';
+    btn.style.cssText = 'position:fixed;bottom:16px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid #e2e1dc;background:#fff;color:#ccc;font-size:14px;cursor:pointer;z-index:8888;transition:color 0.2s;';
+    btn.onmouseenter = () => btn.style.color = '#0f0f1a';
+    btn.onmouseleave = () => btn.style.color = '#ccc';
+    btn.onclick = () => mostrarPanellAdmin();
+    document.body.appendChild(btn);
+  }
 
-  // aC: selectora de textarea amb prefix vm. (BATX parcial) i fallback genèric (ESO)
-  function aC(text,idx2,wM,cb){
-    const cm=text.split('\n');
-    const rows=gR();
-    const tg=idx2!==null?idx2.map(i=>rows[i]):rows;
-    const sk=[];
-    function next(i){
-      if(i>=cm.length||i>=tg.length){cb(sk);return;}
-      const row=tg[i];if(!row){next(i+1);return;}
-      if(wM==='skip'&&rCm(row)){sk.push(gN(row));next(i+1);return;}
-      const btn=row.querySelector('a.glyphicon-new-window');
-      if(!btn){next(i+1);return;}
-      btn.click();
-      _st(()=>{
-        const ta=_q('textarea[data-ng-model="vm.commentsToModify.commentsToModifyModal"]')||_q('textarea.form-control');
-        const save=_q('a[data-ng-click="vm.modalSave()"]');
-        if(!ta||!save){next(i+1);return;}
-        ta.focus();ta.value=cm[i];
-        ta.dispatchEvent(new Event('input',{bubbles:true}));
-        ta.dispatchEvent(new Event('change',{bubbles:true}));
-        _st(()=>{save.click();_st(()=>next(i+1),700);},300);
-      },1000);
+  // ── Panell d'administrador ──
+  function mostrarPanellAdmin() {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:"Instrument Sans",sans-serif;';
+    ov.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:36px;width:340px;max-width:90vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.15)">
+        <div style="font-size:32px;margin-bottom:12px">⚙️</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#0f0f1a;margin-bottom:6px">Zona d'administrador</h2>
+        <p style="font-size:13px;color:#9898a8;margin-bottom:20px;line-height:1.5">Introdueix la contrasenya d'administrador</p>
+        <input id="admin-input" type="password" placeholder="Contrasenya d'administrador"
+          style="width:100%;padding:12px 14px;border:1.5px solid #e2e1dc;border-radius:10px;font-size:14px;outline:none;font-family:'Instrument Sans',sans-serif;color:#0f0f1a;box-sizing:border-box;margin-bottom:10px;"
+          onkeydown="if(event.key==='Enter')document.getElementById('admin-btn').click()"
+        />
+        <p id="admin-error" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:8px"></p>
+        <div style="display:flex;gap:8px">
+          <button onclick="this.closest('div').parentElement.parentElement.remove()" style="flex:1;padding:11px;border:1.5px solid #e2e1dc;border-radius:10px;background:transparent;font-size:13px;cursor:pointer;color:#9898a8;">Cancel·lar</button>
+          <button id="admin-btn" style="flex:2;padding:11px;border:none;border-radius:10px;background:#0f0f1a;color:#fff;font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Entrar →</button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    setTimeout(() => document.getElementById('admin-input').focus(), 100);
+
+    document.getElementById('admin-btn').addEventListener('click', () => {
+      if (document.getElementById('admin-input').value === ADMIN_PWD) {
+        ov.remove();
+        mostrarCanviContrasenya();
+      } else {
+        document.getElementById('admin-error').textContent = 'Contrasenya incorrecta.';
+        document.getElementById('admin-input').value = '';
+        document.getElementById('admin-input').focus();
+      }
+    });
+  }
+
+  // ── Panell de canvi de contrasenya ──
+  function mostrarCanviContrasenya() {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:"Instrument Sans",sans-serif;';
+    ov.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:36px;width:340px;max-width:90vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.15)">
+        <div style="font-size:32px;margin-bottom:12px">🔑</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#0f0f1a;margin-bottom:6px">Canviar contrasenya</h2>
+        <p style="font-size:13px;color:#9898a8;margin-bottom:20px;line-height:1.5">Escriu la nova contrasenya pels usuaris</p>
+        <input id="nova-pwd" type="text" placeholder="Nova contrasenya"
+          style="width:100%;padding:12px 14px;border:1.5px solid #e2e1dc;border-radius:10px;font-size:14px;outline:none;font-family:'Instrument Sans',sans-serif;color:#0f0f1a;box-sizing:border-box;margin-bottom:10px;"
+        />
+        <p id="canvi-msg" style="font-size:12px;min-height:18px;margin-bottom:8px"></p>
+        <div style="display:flex;gap:8px">
+          <button onclick="this.closest('div').parentElement.parentElement.remove()" style="flex:1;padding:11px;border:1.5px solid #e2e1dc;border-radius:10px;background:transparent;font-size:13px;cursor:pointer;color:#9898a8;">Cancel·lar</button>
+          <button id="canvi-btn" style="flex:2;padding:11px;border:none;border-radius:10px;background:#2a7d4f;color:#fff;font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Guardar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    setTimeout(() => document.getElementById('nova-pwd').focus(), 100);
+
+    document.getElementById('canvi-btn').addEventListener('click', async () => {
+      const nova = document.getElementById('nova-pwd').value.trim();
+      const msg = document.getElementById('canvi-msg');
+      if (!nova) { msg.style.color = '#dc2626'; msg.textContent = 'Escriu una contrasenya.'; return; }
+      document.getElementById('canvi-btn').textContent = 'Guardant...';
+      document.getElementById('canvi-btn').disabled = true;
+      const ok = await actualitzarContrasenya(nova);
+      if (ok) {
+        msg.style.color = '#2a7d4f';
+        msg.textContent = '✓ Contrasenya actualitzada!';
+        setTimeout(() => ov.remove(), 1500);
+      } else {
+        msg.style.color = '#dc2626';
+        msg.textContent = 'Error en guardar. Comprova la configuració.';
+        document.getElementById('canvi-btn').textContent = 'Guardar';
+        document.getElementById('canvi-btn').disabled = false;
+      }
+    });
+  }
+
+  // ── Inici ──
+  (async () => {
+    if (sessionStorage.getItem('auth') === 'ok') {
+      mostrar();
+      return;
     }
-    next(0);
-  }
-
-  const clrs={notes:'#4e7f4e',comentaris:'#3d6b9e',ambdos:'#7a4e9e'};
-  const lbls={notes:'Aplicar notes',comentaris:'Aplicar comentaris',ambdos:'Aplicar notes i comentaris'};
-  function mkBtn(txt,bg,fn){const b=_c('button');b.textContent=txt;b.style.cssText=`display:block;width:100%;padding:12px 16px;margin-bottom:8px;border:none;border-radius:8px;background:${bg};color:#fff;font-size:14px;font-weight:500;cursor:pointer;text-align:left;`;b.onclick=fn;return b;}
-  function mkCancel(txt,fn){const b=_c('button');b.textContent=txt||'Cancel·lar';b.style.cssText='width:100%;padding:9px;border:1px solid #ccc;border-radius:8px;background:transparent;font-size:13px;cursor:pointer;color:#666;margin-top:4px;';b.onclick=fn||close;return b;}
-  function mkBack(fn){const b=_c('button');b.textContent='← Tornar';b.style.cssText='background:none;border:none;color:#666;font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;display:block;';b.onclick=fn;return b;}
-  function mkLbl(txt){const l=_c('label');l.textContent=txt;l.style.cssText='display:block;font-weight:500;font-size:13px;color:#555;margin-bottom:4px;';return l;}
-  function mkTA(ph){const t=_c('textarea');t.placeholder=ph;t.style.cssText='width:100%;height:80px;box-sizing:border-box;border:1px solid #ccc;border-radius:6px;padding:6px 8px;font-size:12px;font-family:monospace;margin-bottom:12px;resize:vertical;';return t;}
-  function mkCtx(){const b=_c('div');b.textContent=CTX;b.style.cssText='display:inline-block;background:#f0f4ff;color:#3d6b9e;border:1px solid #c5d5f0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;margin-bottom:14px;';return b;}
-  function sS(skN,skC){const allNames=[...new Set([...skN,...skC])];if(!allNames.length){close();return;}md.innerHTML='';const ic=_c('div');ic.textContent='⚠';ic.style.cssText='font-size:26px;margin-bottom:8px;';md.ap(ic);const h=_c('p');h.style.cssText='font-weight:500;font-size:15px;margin:0 0 6px;';h.textContent='Alumnes no modificats';md.ap(h);const setN=new Set(skN);const setC=new Set(skC);const parts=[];if(skN.length)parts.push('notes');if(skC.length)parts.push('comentaris');const sub=_c('p');sub.style.cssText='font-size:13px;color:#666;margin:0 0 12px;line-height:1.5;';sub.textContent=`Els alumnes següents ja tenien ${parts.join(' o ')} i no s'han sobreescrit:`;md.ap(sub);const ul=_c('ul');ul.style.cssText='font-size:13px;margin:0 0 16px;padding-left:18px;line-height:1.9;max-height:200px;overflow-y:auto;';allNames.forEach(name=>{const li=_c('li');const tags=[];if(setN.has(name))tags.push('notes');if(setC.has(name))tags.push('comentaris');li.textContent=`${name} (${tags.join(', ')})`;ul.ap(li);});md.ap(ul);const ok=_c('button');ok.textContent='Tancar';ok.style.cssText='width:100%;padding:11px;border:none;border-radius:8px;background:#555;color:#fff;font-size:14px;font-weight:500;cursor:pointer;';ok.onclick=close;md.ap(ok);}
-  function sF(mode,idx2,wM){md.innerHTML='';md.ap(mkCtx());md.ap(mkBack(()=>idx2===null?sSc(mode,wM):sPk(mode,wM)));let nTA=null,cTA=null;if(mode==='notes'||mode==='ambdos'){md.ap(mkLbl('Notes'));nTA=mkTA("Enganxa les notes des d'Excel");md.ap(nTA);}if(mode==='comentaris'||mode==='ambdos'){md.ap(mkLbl('Comentaris'));cTA=mkTA('Enganxa els comentaris (un per línia)');md.ap(cTA);}const ap=_c('button');ap.textContent=lbls[mode];ap.style.cssText=`width:100%;padding:11px;border:none;border-radius:8px;background:${clrs[mode]};color:#fff;font-size:14px;font-weight:500;cursor:pointer;`;ap.onclick=()=>{const skN=nTA?aN(nTA.value,idx2,wM):[];if(cTA){aC(cTA.value,idx2,wM,skC=>sS(skN,skC));}else{sS(skN,[]);}};md.ap(ap);}
-  function sPk(mode,wM){md.innerHTML='';md.ap(mkCtx());md.ap(mkBack(()=>sSc(mode,wM)));const rows=gR();const h=_c('p');h.textContent='Selecciona els alumnes';h.style.cssText='font-weight:500;font-size:15px;margin:0 0 10px;';md.ap(h);const sr=_c('div');sr.style.cssText='display:flex;gap:8px;margin-bottom:8px;';const sA=_c('button');sA.textContent='Tots';sA.style.cssText='flex:1;padding:5px;border:1px solid #ccc;border-radius:6px;background:transparent;font-size:12px;cursor:pointer;';const sN=_c('button');sN.textContent='Cap';sN.style.cssText='flex:1;padding:5px;border:1px solid #ccc;border-radius:6px;background:transparent;font-size:12px;cursor:pointer;';sr.ap(sA);sr.ap(sN);md.ap(sr);const ld=_c('div');ld.style.cssText='max-height:220px;overflow-y:auto;border:1px solid #eee;border-radius:6px;margin-bottom:12px;';const cbs=[];rows.forEach((row,i)=>{const name=gN(row)||`Alumne ${i+1}`;const item=_c('label');item.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;';const cb=_c('input');cb.type='checkbox';cb.checked=true;cbs.push(cb);item.ap(cb);item.ap(document.createTextNode(name));ld.ap(item);});md.ap(ld);sA.onclick=()=>cbs.forEach(c=>c.checked=true);sN.onclick=()=>cbs.forEach(c=>c.checked=false);const ap=_c('button');ap.textContent='Continuar';ap.style.cssText=`width:100%;padding:11px;border:none;border-radius:8px;background:${clrs[mode]};color:#fff;font-size:14px;font-weight:500;cursor:pointer;`;ap.onclick=()=>{const idx=cbs.map((c,i)=>c.checked?i:null).filter(i=>i!==null);if(!idx.length)return;sF(mode,idx,wM);};md.ap(ap);}
-  function sSc(mode,wM){md.innerHTML='';md.ap(mkCtx());md.ap(mkBack(sCh));const h=_c('p');h.textContent='A quins alumnes?';h.style.cssText='font-weight:500;font-size:16px;margin:0 0 16px;';md.ap(h);md.ap(mkBtn('Tots els alumnes del grup',clrs[mode],()=>sF(mode,null,wM)));md.ap(mkBtn('Escollir alumnes','#888',()=>sPk(mode,wM)));}
-  function sW(msg,mode){md.innerHTML='';md.ap(mkCtx());md.ap(mkBack(sCh));const ic=_c('div');ic.textContent='⚠';ic.style.cssText='font-size:28px;margin-bottom:8px;';md.ap(ic);const h=_c('p');h.style.cssText='font-weight:500;font-size:15px;margin:0 0 8px;';h.textContent='Ja hi ha dades existents';md.ap(h);const s=_c('p');s.style.cssText='font-size:13px;color:#666;margin:0 0 16px;line-height:1.5;';s.textContent=msg;md.ap(s);md.ap(mkBtn('Reescriure tot','#c0392b',()=>sSc(mode,'overwrite')));md.ap(mkBtn('No sobreescriure els que ja en tienen','#e67e22',()=>sSc(mode,'skip')));md.ap(mkCancel('Cancel·lar',close));}
-  function cAS(mode){const nWarn=(mode==='notes'||mode==='ambdos')&&hN();const cWarn=(mode==='comentaris'||mode==='ambdos')&&hC();const parts=[];if(nWarn)parts.push('notes');if(cWarn)parts.push('comentaris');if(parts.length){sW(`Ja hi ha ${parts.join(' i ')} introduïts.`,mode);}else{sSc(mode,'overwrite');}}
-  function sCh(){md.innerHTML='';md.ap(mkCtx());const h=_c('p');h.style.cssText='font-weight:500;font-size:16px;margin:0 0 16px;';h.textContent='Què vols fer?';md.ap(h);md.ap(mkBtn('Posar notes','#4e7f4e',()=>cAS('notes')));md.ap(mkBtn('Posar comentaris','#3d6b9e',()=>cAS('comentaris')));md.ap(mkBtn('Posar notes i comentaris','#7a4e9e',()=>cAS('ambdos')));md.ap(mkCancel());const cr=_c('p');cr.textContent='© 2026 Ignasi Martí Palet';cr.style.cssText='font-size:11px;color:#9ca3af;text-align:center;margin-top:14px;margin-bottom:0';md.ap(cr);}
-  sCh();ov.ap(md);_ba(ov);
-
-}else{
-  alert('⚠️ Aquest bookmarklet només funciona a:\n• Qualificacions per grup i matèria\n• Qualificacions per grup i alumne/a\n• Avaluacions finals de batxillerat');
-}
-})();
+    const carregant = mostrarCarregant();
+    const contrasenya = await obtenirContrasenya();
+    carregant.remove();
+    if (!contrasenya) {
+      alert('Error en connectar amb JSONbin. Comprova el BIN_ID i la API_KEY al fitxer HTML.');
+      return;
+    }
+    mostrarPantalla(contrasenya);
+  })();
+</script>
+</body>
+</html>
