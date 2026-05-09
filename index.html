@@ -332,8 +332,8 @@
     <div class="drag-zone">
       <p>↓ Arrossega aquest botó fins a la barra de marcadors ↓</p>
       <a class="bookmarklet-btn"
-        href="javascript:(function(){if(window.esferaLoaded)return;window.esferaLoaded=true;var s=document.createElement('script');s.src='https://ignasimartipalet.github.io/Bookmarklet_Esfera/esfera.js?v='+Date.now();document.head.appendChild(s);})()"
-        <span class="icon">🎓</span>
+        href="javascript:(function(){window.esferaLoaded=false;var old=document.getElementById('esfera-overlay')||document.getElementById('esfera-overlay-batx');if(old)old.remove();var s=document.createElement('script');s.src='https://ignasimartipalet.github.io/Bookmarklet_Esfera/esfera.js?v='+Date.now();document.head.appendChild(s);})()"
+      ><span class="icon">🎓</span>
         Assistent Esfer@
       </a>
     </div>
