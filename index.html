@@ -469,7 +469,9 @@
 
   // ── Botó discret d'administrador al peu ──
   function afegirBotoAdmin() {
+    if (document.getElementById('admin-gear-btn')) return;
     const btn = document.createElement('button');
+    btn.id = 'admin-gear-btn';
     btn.textContent = '⚙';
     btn.title = 'Administrador';
     btn.style.cssText = 'position:fixed;bottom:16px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid #e2e1dc;background:#fff;color:#ccc;font-size:14px;cursor:pointer;z-index:8888;transition:color 0.2s;';
